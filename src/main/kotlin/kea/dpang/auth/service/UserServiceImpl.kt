@@ -6,7 +6,7 @@ import kea.dpang.auth.exception.InvalidVerificationCodeException
 import kea.dpang.auth.exception.UserNotFoundException
 import kea.dpang.auth.exception.VerificationCodeNotFoundException
 import kea.dpang.auth.repository.UserRepository
-import kea.dpang.auth.repository.VerificationCodeRepository
+import kea.dpang.auth.redis.repository.VerificationCodeRepository
 import lombok.extern.slf4j.Slf4j
 import org.slf4j.LoggerFactory
 import org.springframework.security.crypto.password.PasswordEncoder

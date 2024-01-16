@@ -1,4 +1,4 @@
-package kea.dpang.auth.entity
+package kea.dpang.auth.redis.entity
 
 import lombok.AllArgsConstructor
 import lombok.Builder

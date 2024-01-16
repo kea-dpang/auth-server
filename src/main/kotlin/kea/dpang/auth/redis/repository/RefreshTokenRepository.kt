@@ -1,6 +1,6 @@
-package kea.dpang.auth.repository
+package kea.dpang.auth.redis.repository
 
-import kea.dpang.auth.entity.RefreshToken
+import kea.dpang.auth.redis.entity.RefreshToken
 import org.springframework.data.repository.CrudRepository
 
 interface RefreshTokenRepository : CrudRepository<RefreshToken, String> {

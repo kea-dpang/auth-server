@@ -5,13 +5,13 @@ import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.*
 import kea.dpang.auth.entity.User
-import kea.dpang.auth.entity.VerificationCode
+import kea.dpang.auth.redis.entity.VerificationCode
 import kea.dpang.auth.exception.InvalidPasswordException
 import kea.dpang.auth.exception.InvalidVerificationCodeException
 import kea.dpang.auth.exception.UserNotFoundException
 import kea.dpang.auth.exception.VerificationCodeNotFoundException
 import kea.dpang.auth.repository.UserRepository
-import kea.dpang.auth.repository.VerificationCodeRepository
+import kea.dpang.auth.redis.repository.VerificationCodeRepository
 
 import org.springframework.security.crypto.password.PasswordEncoder
 import java.util.*

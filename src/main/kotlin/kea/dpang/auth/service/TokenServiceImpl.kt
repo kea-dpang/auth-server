@@ -1,7 +1,7 @@
 package kea.dpang.auth.service
 
 import kea.dpang.auth.dto.Token
-import kea.dpang.auth.repository.RefreshTokenRepository
+import kea.dpang.auth.redis.repository.RefreshTokenRepository
 
 class TokenServiceImpl(
     private val tokenRepository: RefreshTokenRepository
