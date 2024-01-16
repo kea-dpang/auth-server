@@ -2,7 +2,9 @@ package kea.dpang.auth.service
 
 import kea.dpang.auth.base.Role
 import kea.dpang.auth.exception.InvalidPasswordException
+import kea.dpang.auth.exception.InvalidVerificationCodeException
 import kea.dpang.auth.exception.UserNotFoundException
+import kea.dpang.auth.exception.VerificationCodeNotFoundException
 import kea.dpang.auth.repository.UserRepository
 import kea.dpang.auth.repository.VerificationCodeRepository
 import lombok.extern.slf4j.Slf4j
@@ -31,7 +33,26 @@ class UserServiceImpl(
     }
 
     override fun verifyCodeAndResetPassword(email: String, code: String, newPassword: String) {
-        TODO("Not yet implemented")
+        // 이메일로 사용자 조회
+        val user = userRepository.findByEmail(email).orElseThrow {
+            UserNotFoundException(email)
+        }
+
+        // 이메일로 인증 코드 조회
+        val storedCode = verificationCodeRepository.findById(email).orElseThrow {
+            VerificationCodeNotFoundException(email)
+        }
+
+        // 입력받은 인증 코드와 저장된 인증 코드 비교
+        if (storedCode.code != code) {
+            throw InvalidVerificationCodeException(email)
+        }
+
+        // 인증 코드가 일치하면 비밀번호 변경
+        user.password = passwordEncoder.encode(newPassword)
+
+        // 인증 코드 삭제
+        verificationCodeRepository.delete(storedCode)
     }
 
     override fun changePassword(email: String, oldPassword: String, newPassword: String) {
