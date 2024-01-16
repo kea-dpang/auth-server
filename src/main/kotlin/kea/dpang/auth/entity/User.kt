@@ -22,7 +22,7 @@ data class User(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     var userIdx: Int? = null,
 
-    var id: String? = null, // 사용자의 경우 ID는 email
+    var email: String? = null,
 
     var password: String? = null,
 
