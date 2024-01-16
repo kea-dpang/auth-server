@@ -16,7 +16,7 @@ import kea.dpang.auth.repository.VerificationCodeRepository
 import org.springframework.security.crypto.password.PasswordEncoder
 import java.util.*
 
-class UserServiceTest : BehaviorSpec({
+class UserServiceImplUnitTest : BehaviorSpec({
     val mockUserRepository = mockk<UserRepository>()
     val mockVerificationCodeRepository = mockk<VerificationCodeRepository>()
     val mockPasswordEncoder = mockk<PasswordEncoder>()
