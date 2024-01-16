@@ -22,6 +22,45 @@ class UserServiceTest : BehaviorSpec({
     val mockPasswordEncoder = mockk<PasswordEncoder>()
     val userService = UserServiceImpl(mockUserRepository, mockVerificationCodeRepository, mockPasswordEncoder)
 
+    Given("사용자가 자신을 인증하려고 할 때") {
+        val email = "test@example.com"
+        val password = "password"
+        val encodedPassword = "encodedPassword"
+        val userIdx = 1
+        val user = User(userIdx = userIdx, email = email, password = encodedPassword)
+
+        every { mockUserRepository.findByEmail(email) } returns Optional.of(user)
+        every { mockPasswordEncoder.matches(password, encodedPassword) } returns true
+
+        When("입력받은 비밀번호가 저장된 비밀번호와 일치하는 경우") {
+            val result = userService.verifyUser(email, password)
+
+            Then("사용자의 고유 식별자가 반환되어야 한다") {
+                result shouldBe userIdx
+            }
+        }
+
+        When("입력받은 비밀번호가 저장된 비밀번호와 일치하지 않는 경우") {
+            every { mockPasswordEncoder.matches(password, encodedPassword) } returns false
+
+            Then("InvalidPasswordException이 발생해야 한다") {
+                shouldThrow<InvalidPasswordException> {
+                    userService.verifyUser(email, password)
+                }
+            }
+        }
+
+        When("해당 이메일을 가진 사용자가 없는 경우") {
+            every { mockUserRepository.findByEmail(email) } returns Optional.empty()
+
+            Then("UserNotFoundException이 발생해야 한다") {
+                shouldThrow<UserNotFoundException> {
+                    userService.verifyUser(email, password)
+                }
+            }
+        }
+    }
+
     Given("사용자가 비밀번호를 재설정하려고 할 때") {
         val email = "test@example.com"
         val code = "123456"

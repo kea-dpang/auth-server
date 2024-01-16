@@ -25,7 +25,18 @@ class UserServiceImpl(
     }
 
     override fun verifyUser(email: String, password: String): Int {
-        TODO("Not yet implemented")
+        // 이메일로 사용자 조회
+        val user = userRepository.findByEmail(email).orElseThrow {
+            UserNotFoundException(email)
+        }
+
+        // 입력받은 비밀번호와 저장된 비밀번호 비교
+        if (!passwordEncoder.matches(password, user.password)) {
+            throw InvalidPasswordException(email)
+        }
+
+        // 비밀번호가 일치하면 사용자의 고유 식별자 반환
+        return user.userIdx!!
     }
 
     override fun requestPasswordReset(email: String) {
