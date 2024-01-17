@@ -6,22 +6,17 @@ import lombok.Getter
 import lombok.NoArgsConstructor
 import org.springframework.data.annotation.Id
 import org.springframework.data.redis.core.RedisHash
-import org.springframework.data.redis.core.TimeToLive
 import org.springframework.data.redis.core.index.Indexed
 
 @Builder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@RedisHash("VerificationCode")
+@RedisHash("VerificationCode", timeToLive = 60 * 5) // 5분
 data class VerificationCode(
 
-    @Id
-    @Indexed
-    var id: String? = null,
+    @Id @Indexed
+    var email: String, // 사용자 이메일
 
-    var code: String? = null,
-
-    @TimeToLive
-    var expiration: Long? = 300L // 5분
+    var code: String, // 사용자 인증 번호
 )

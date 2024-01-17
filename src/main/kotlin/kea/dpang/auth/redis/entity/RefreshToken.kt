@@ -6,31 +6,28 @@ import lombok.Getter
 import lombok.NoArgsConstructor
 import org.springframework.data.annotation.Id
 import org.springframework.data.redis.core.RedisHash
-import org.springframework.data.redis.core.TimeToLive
 import org.springframework.data.redis.core.index.Indexed
 
 @Builder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@RedisHash("RefreshToken")
-class RefreshToken protected constructor(
-    id: String,
-    refreshToken: String,
-    expiration: Long
-) {
+@RedisHash("RefreshToken", timeToLive = 60 * 60 * 24 * 5) // 5일
+data class RefreshToken(
+    // 사용자 식별자
+    @Id @Indexed
+    var id: Int,
 
-    @Id
-    var refreshToken: String = refreshToken
-        protected set
+    // 사용자 리프레쉬 토큰
+    var refreshToken: String
+)
 
-    @Indexed
-    var id: String = id
-        protected set
+/*
+<Redis>
 
-    @TimeToLive
-    var expiration: Long = expiration
-        protected set
-
+RefreshToken{
+    "userId1" : "refreshToken1",
+    "userId2" : "refreshToken2",
+    ...
 }
-
+ */

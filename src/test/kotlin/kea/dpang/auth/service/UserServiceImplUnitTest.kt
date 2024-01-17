@@ -67,7 +67,7 @@ class UserServiceImplUnitTest : BehaviorSpec({
         val newPassword = "newPassword"
         val encodedPassword = "encodedNewPassword"
         val user = User(email = email, password = "oldPassword")
-        val verificationCode = VerificationCode(id = email, code = code)
+        val verificationCode = VerificationCode(email = email, code = code)
 
         every { mockUserRepository.findByEmail(email) } returns Optional.of(user)
         every { mockVerificationCodeRepository.findById(email) } returns Optional.of(verificationCode)
