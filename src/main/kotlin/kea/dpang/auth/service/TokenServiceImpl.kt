@@ -3,6 +3,7 @@ package kea.dpang.auth.service
 import kea.dpang.auth.dto.Token
 import kea.dpang.auth.exception.InvalidRefreshTokenException
 import kea.dpang.auth.exception.UserNotFoundException
+import kea.dpang.auth.redis.entity.RefreshToken
 import kea.dpang.auth.redis.repository.RefreshTokenRepository
 import kea.dpang.auth.repository.UserRepository
 import kea.dpang.auth.utils.JwtTokenProvider
@@ -18,8 +19,30 @@ class TokenServiceImpl(
     private val jwtTokenProvider: JwtTokenProvider
 ) : TokenService {
 
-    override fun createToken(identifier: String): Token {
-        TODO("Not yet implemented")
+    override fun createToken(identifier: Long): Token {
+        // 사용자 정보를 조회한다.
+        val user = userRepository.findById(identifier).orElseThrow {
+            UserNotFoundException(identifier.toString())
+        }
+
+        // 사용자의 권한을 설정한다.
+        val authorities = listOf(SimpleGrantedAuthority(user.role.toString()))
+        val authentication: Authentication =
+            UsernamePasswordAuthenticationToken(user.email, user.password, authorities)
+
+        // JWT 토큰을 생성한다.
+        val jwtToken = jwtTokenProvider.createTokens(authentication, identifier)
+
+        // 이미 Redis에 해당 사용자의 리프레시 토큰이 존재한다면 삭제합니다.
+        if (tokenRepository.existsById(identifier)) {
+            tokenRepository.deleteById(identifier)
+        }
+
+        // Redis에 새로운 리프레시 토큰을 저장합니다.
+        val refreshToken = RefreshToken(identifier, jwtToken.refreshToken)
+        tokenRepository.save(refreshToken)
+
+        return jwtToken
     }
 
     override fun refreshToken(accessToken: String): Token {

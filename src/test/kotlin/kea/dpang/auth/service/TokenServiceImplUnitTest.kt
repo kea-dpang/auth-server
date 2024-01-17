@@ -1,5 +1,6 @@
 package kea.dpang.auth.service
 
+import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.*
@@ -20,7 +21,77 @@ class TokenServiceImplUnitTest : BehaviorSpec({
     val mockUserRepository = mockk<UserRepository>()
     val mockRefreshTokenRepository = mockk<RefreshTokenRepository>()
 
-    val tokenService = TokenServiceImpl(mockRefreshTokenRepository, mockUserRepository, mockJwtTokenProvider)
+    lateinit var tokenService: TokenServiceImpl
+
+    beforeTest {
+        tokenService = TokenServiceImpl(mockRefreshTokenRepository, mockUserRepository, mockJwtTokenProvider)
+    }
+
+    afterTest {
+        clearMocks(mockJwtTokenProvider, mockUserRepository, mockRefreshTokenRepository)
+    }
+
+    Given("사용자 ID와 매칭되는 유저가 존재하고, 해당 유저의 리프레시 토큰이 이미 Redis에 존재하는 경우") {
+        val identifier = 1L
+        val user = User(identifier, "test@email.com", "password", Role.USER)
+        val jwtToken = Token("new_access_token", "new_refresh_token")
+        val refreshToken = RefreshToken(identifier, jwtToken.refreshToken)
+
+        every { mockUserRepository.findById(identifier) } returns Optional.of(user)
+        every { mockJwtTokenProvider.createTokens(any(), any()) } returns jwtToken
+        every { mockRefreshTokenRepository.existsById(identifier) } returns true
+        every { mockRefreshTokenRepository.deleteById(identifier) } just Runs
+        every { mockRefreshTokenRepository.save(refreshToken) } returns refreshToken
+
+        When("토큰 생성을 요청하면") {
+            val result = tokenService.createToken(identifier)
+
+            Then("새로운 토큰이 생성되어야 하고, 기존 토큰은 삭제되어야 한다") {
+                result.accessToken shouldBe "new_access_token"
+                result.refreshToken shouldBe "new_refresh_token"
+                verify { mockRefreshTokenRepository.deleteById(identifier) }
+                verify { mockRefreshTokenRepository.save(refreshToken) }
+            }
+        }
+    }
+
+    Given("사용자 ID와 매칭되는 유저가 존재하지만, 해당 유저의 리프레시 토큰이 Redis에 존재하지 않는 경우") {
+        val identifier = 1L
+        val user = User(identifier, "test@email.com", "password", Role.USER)
+        val jwtToken = Token("new_access_token", "new_refresh_token")
+        val refreshToken = RefreshToken(identifier, jwtToken.refreshToken)
+
+        every { mockUserRepository.findById(identifier) } returns Optional.of(user)
+        every { mockJwtTokenProvider.createTokens(any(), any()) } returns jwtToken
+        every { mockRefreshTokenRepository.existsById(identifier) } returns false
+        every { mockRefreshTokenRepository.save(refreshToken) } returns refreshToken
+
+        When("토큰 생성을 요청하면") {
+            val result = tokenService.createToken(identifier)
+
+            Then("새로운 토큰이 생성되고, Redis에 저장되어야 한다") {
+                result.accessToken shouldBe "new_access_token"
+                result.refreshToken shouldBe "new_refresh_token"
+                verify(exactly = 0) { mockRefreshTokenRepository.deleteById(identifier) }
+                verify { mockRefreshTokenRepository.save(refreshToken) }
+            }
+        }
+    }
+
+    Given("사용자 ID와 매칭되는 유저가 존재하지 않는 경우") {
+        val identifier = 1L
+
+        every { mockUserRepository.findById(identifier) } returns Optional.empty()
+
+        When("토큰 생성을 요청하면") {
+            Then("UserNotFoundException이 발생해야 한다") {
+                shouldThrow<UserNotFoundException> {
+                    tokenService.createToken(identifier)
+                }
+            }
+        }
+    }
+
 
     Given("사용자 ID와 매칭되는 유저와 토큰이 존재하는 경우") {
         val userIdx = 1L

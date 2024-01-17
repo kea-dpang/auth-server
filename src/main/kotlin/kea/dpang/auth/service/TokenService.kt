@@ -9,7 +9,7 @@ interface TokenService {
      *
      * 사용자 식별자를 기반으로 새로운 인증 토큰을 반환합니다.
      */
-    fun createToken(identifier: String): Token
+    fun createToken(identifier: Long): Token
 
     /**
      * 토큰 갱신 메서드.
