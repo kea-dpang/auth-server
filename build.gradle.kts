@@ -39,6 +39,8 @@ dependencies {
     testImplementation("io.kotest:kotest-assertions-core:5.8.0")
     testImplementation("io.mockk:mockk:1.13.9")
 
+    // JWT
+    implementation("io.jsonwebtoken:jjwt:0.12.3")
 
     // Lombok
     compileOnly("org.projectlombok:lombok")
