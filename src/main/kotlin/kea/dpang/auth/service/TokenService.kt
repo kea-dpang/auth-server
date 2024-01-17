@@ -16,7 +16,7 @@ interface TokenService {
      *
      * 사용자의 기존 리프레시 토큰을 입력받아 새로운 인증 토큰을 반환합니다.
      */
-    fun refreshToken(token: String): Token
+    fun refreshToken(accessToken: String): Token
 
     /**
      * 토큰 제거 메서드.

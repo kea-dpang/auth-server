@@ -109,13 +109,12 @@ class JwtTokenProvider @Autowired constructor(
     }
 
     /**
-     * JWT 토큰에서 식별자를 추출하는 메소드
+     * Access token에서 식별자를 추출하는 메소드
      *
-     * @param token JWT 토큰
+     * @param token Access token
      * @return 토큰에서 추출된 식별자
      */
-    // JWT 토큰에서 client-id 값을 추출하는 메소드
-    fun getClientIdFromToken(token: String?): Int? {
+    fun getClientIdFromAccessToken(token: String?): Int? {
         // JJWT에서 제공하는 parserBuilder를 통해 JwtParser를 생성
         val jwtParser: JwtParser = Jwts.parser()
             .verifyWith(secretKey)
@@ -128,6 +127,5 @@ class JwtTokenProvider @Autowired constructor(
         // Claims에서 client-id 추출
         return claims["client-id", Int::class.java]
     }
-
 
 }
