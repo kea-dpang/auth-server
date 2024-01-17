@@ -20,7 +20,7 @@ data class User(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var userIdx: Int? = null,
+    var userIdx: Long? = null,
 
     var email: String? = null,
 

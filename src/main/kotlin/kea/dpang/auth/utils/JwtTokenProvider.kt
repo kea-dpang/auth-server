@@ -44,7 +44,7 @@ class JwtTokenProvider @Autowired constructor(
      * @throws Exception 토큰 생성 중 발생한 예외를 처리하기 위해 사용된다.
      */
     @Throws(Exception::class)
-    fun createTokens(authentication: Authentication, userIdx: Int): Token {
+    fun createTokens(authentication: Authentication, userIdx: Long): Token {
         // 생성된 액세스 토큰과 리프레시 토큰을 포함하는 Token 객체를 반환한다.
         return Token(
             accessToken = createAccessToken(authentication, userIdx),
@@ -61,7 +61,7 @@ class JwtTokenProvider @Autowired constructor(
      * @return 생성된 JWT 액세스 토큰
      */
     @Throws(Exception::class)
-    fun createAccessToken(authentication: Authentication, userIdx: Int): String {
+    fun createAccessToken(authentication: Authentication, userIdx: Long): String {
         // 사용자의 역할을 가져와서 콤마로 분리된 문자열로 변환한다.
         val roles = authentication.authorities.stream()
             .map(GrantedAuthority::getAuthority)
@@ -114,7 +114,7 @@ class JwtTokenProvider @Autowired constructor(
      * @param token Access token
      * @return 토큰에서 추출된 식별자
      */
-    fun getClientIdFromAccessToken(token: String?): Int? {
+    fun getClientIdFromAccessToken(token: String?): Long? {
         // JJWT에서 제공하는 parserBuilder를 통해 JwtParser를 생성
         val jwtParser: JwtParser = Jwts.parser()
             .verifyWith(secretKey)
@@ -125,7 +125,7 @@ class JwtTokenProvider @Autowired constructor(
         val claims = jwsClaims.payload
 
         // Claims에서 client-id 추출
-        return claims["client-id", Int::class.java]
+        return claims["client-id", Long::class.java]
     }
 
 }

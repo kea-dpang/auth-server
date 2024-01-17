@@ -24,7 +24,7 @@ class UserServiceImpl(
         TODO("Not yet implemented")
     }
 
-    override fun verifyUser(email: String, password: String): Int {
+    override fun verifyUser(email: String, password: String): Long {
         // 이메일로 사용자 조회
         val user = userRepository.findByEmail(email).orElseThrow {
             UserNotFoundException(email)

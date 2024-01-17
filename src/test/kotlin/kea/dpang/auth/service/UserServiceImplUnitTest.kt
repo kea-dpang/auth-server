@@ -26,7 +26,7 @@ class UserServiceImplUnitTest : BehaviorSpec({
         val email = "test@example.com"
         val password = "password"
         val encodedPassword = "encodedPassword"
-        val userIdx = 1
+        val userIdx = 1L
         val user = User(userIdx = userIdx, email = email, password = encodedPassword)
 
         every { mockUserRepository.findByEmail(email) } returns Optional.of(user)

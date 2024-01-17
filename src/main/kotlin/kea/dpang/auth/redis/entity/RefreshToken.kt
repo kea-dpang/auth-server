@@ -16,7 +16,7 @@ import org.springframework.data.redis.core.index.Indexed
 data class RefreshToken(
     // 사용자 식별자
     @Id @Indexed
-    var id: Int,
+    var id: Long,
 
     // 사용자 리프레쉬 토큰
     var refreshToken: String

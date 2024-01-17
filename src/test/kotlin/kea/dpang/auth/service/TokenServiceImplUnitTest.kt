@@ -23,7 +23,7 @@ class TokenServiceImplUnitTest : BehaviorSpec({
     val tokenService = TokenServiceImpl(mockRefreshTokenRepository, mockUserRepository, mockJwtTokenProvider)
 
     Given("사용자 ID와 매칭되는 유저와 토큰이 존재하는 경우") {
-        val userIdx = 1
+        val userIdx = 1L
         val token = "valid_refresh_token"
         val user = User(userIdx, "test@email.com", "password", Role.USER)
         val refreshToken = RefreshToken(userIdx, token)
@@ -46,7 +46,7 @@ class TokenServiceImplUnitTest : BehaviorSpec({
     }
 
     Given("사용자 ID와 매칭되는 유저가 없는 경우") {
-        val invalidUserIdx = 2
+        val invalidUserIdx = 2L
         val invalidToken = "invalid_refresh_token"
 
         every { mockJwtTokenProvider.getClientIdFromAccessToken(invalidToken) } returns invalidUserIdx
@@ -62,7 +62,7 @@ class TokenServiceImplUnitTest : BehaviorSpec({
     }
 
     Given("사용자 ID와 매칭되는 리프레시 토큰이 없는 경우") {
-        val invalidUserIdx = 2
+        val invalidUserIdx = 2L
         val invalidToken = "invalid_refresh_token"
         val user = User(invalidUserIdx, "test2@email.com", "password", Role.USER)
 
@@ -80,7 +80,7 @@ class TokenServiceImplUnitTest : BehaviorSpec({
     }
 
     Given("사용자 ID와 매칭되는 리프레시 토큰이 존재하지만 클라이언트의 리프레시 토큰과 일치하지 않는 경우") {
-        val userIdx = 3
+        val userIdx = 3L
         val clientToken = "client_refresh_token"
         val serverToken = "server_refresh_token"
         val user = User(userIdx, "test3@email.com", "password", Role.USER)
