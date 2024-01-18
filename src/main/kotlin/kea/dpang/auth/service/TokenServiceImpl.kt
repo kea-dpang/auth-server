@@ -2,11 +2,13 @@ package kea.dpang.auth.service
 
 import kea.dpang.auth.dto.Token
 import kea.dpang.auth.exception.InvalidRefreshTokenException
+import kea.dpang.auth.exception.TokenNotFoundException
 import kea.dpang.auth.exception.UserNotFoundException
 import kea.dpang.auth.redis.entity.RefreshToken
 import kea.dpang.auth.redis.repository.RefreshTokenRepository
 import kea.dpang.auth.repository.UserRepository
 import kea.dpang.auth.utils.JwtTokenProvider
+import org.springframework.dao.EmptyResultDataAccessException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.Authentication
@@ -74,6 +76,11 @@ class TokenServiceImpl(
     }
 
     override fun removeToken(identifier: Long) {
-        TODO("Not yet implemented")
+        try {
+            tokenRepository.deleteById(identifier)
+
+        } catch (e: EmptyResultDataAccessException) { // 토큰이 없는 경우에 대한 처리
+            throw TokenNotFoundException(identifier)
+        }
     }
 }

@@ -8,12 +8,14 @@ import kea.dpang.auth.base.Role
 import kea.dpang.auth.dto.Token
 import kea.dpang.auth.entity.User
 import kea.dpang.auth.exception.InvalidRefreshTokenException
+import kea.dpang.auth.exception.TokenNotFoundException
 import kea.dpang.auth.exception.UserNotFoundException
 import kea.dpang.auth.redis.entity.RefreshToken
 import kea.dpang.auth.redis.repository.RefreshTokenRepository
 import kea.dpang.auth.repository.UserRepository
 import kea.dpang.auth.utils.JwtTokenProvider
 import org.junit.jupiter.api.assertThrows
+import org.springframework.dao.EmptyResultDataAccessException
 import java.util.*
 
 class TokenServiceImplUnitTest : BehaviorSpec({
@@ -165,6 +167,30 @@ class TokenServiceImplUnitTest : BehaviorSpec({
             Then("InvalidRefreshTokenException이 발생해야 한다") {
                 assertThrows<InvalidRefreshTokenException> {
                     tokenService.refreshToken(clientToken)
+                }
+            }
+        }
+    }
+
+    Given("사용자가 토큰을 제거하려고 요청할 때") {
+        val identifier = 1L
+
+        When("사용자 식별자가 주어지면") {
+            every { mockRefreshTokenRepository.deleteById(identifier) } returns Unit
+
+            tokenService.removeToken(identifier)
+
+            Then("해당 식별자의 토큰이 제거되어야 한다") {
+                verify { mockRefreshTokenRepository.deleteById(identifier) }
+            }
+        }
+
+        When("사용자의 토큰이 없는 경우") {
+            every { mockRefreshTokenRepository.deleteById(identifier) } throws EmptyResultDataAccessException(0)
+
+            Then("TokenNotFoundException이 발생해야 한다") {
+                shouldThrow<TokenNotFoundException> {
+                    tokenService.removeToken(identifier)
                 }
             }
         }
