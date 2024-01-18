@@ -1,26 +1,36 @@
 package kea.dpang.auth.service
 
+import io.kotest.assertions.throwables.shouldNotThrowAny
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.BehaviorSpec
 import io.kotest.matchers.shouldBe
 import io.mockk.*
 import kea.dpang.auth.entity.User
-import kea.dpang.auth.redis.entity.VerificationCode
 import kea.dpang.auth.exception.InvalidPasswordException
 import kea.dpang.auth.exception.InvalidVerificationCodeException
 import kea.dpang.auth.exception.UserNotFoundException
 import kea.dpang.auth.exception.VerificationCodeNotFoundException
-import kea.dpang.auth.repository.UserRepository
+import kea.dpang.auth.feign.NotificationFeignClient
+import kea.dpang.auth.redis.entity.VerificationCode
 import kea.dpang.auth.redis.repository.VerificationCodeRepository
-
+import kea.dpang.auth.repository.UserRepository
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.security.crypto.password.PasswordEncoder
 import java.util.*
+import kotlin.random.Random
 
 class UserServiceImplUnitTest : BehaviorSpec({
+    val mockNotificationFeignClient = mockk<NotificationFeignClient>()
     val mockUserRepository = mockk<UserRepository>()
     val mockVerificationCodeRepository = mockk<VerificationCodeRepository>()
     val mockPasswordEncoder = mockk<PasswordEncoder>()
-    val userService = UserServiceImpl(mockUserRepository, mockVerificationCodeRepository, mockPasswordEncoder)
+    val userService = UserServiceImpl(
+        mockNotificationFeignClient,
+        mockUserRepository,
+        mockVerificationCodeRepository,
+        mockPasswordEncoder
+    )
 
     Given("사용자가 자신을 인증하려고 할 때") {
         val email = "test@example.com"
@@ -57,6 +67,38 @@ class UserServiceImplUnitTest : BehaviorSpec({
                 shouldThrow<UserNotFoundException> {
                     userService.verifyUser(email, password)
                 }
+            }
+        }
+    }
+
+    Given("사용자가 비밀번호 재설정을 요청할 때") {
+        val email = "test@example.com"
+        val verificationCode = String.format("%04d", Random.nextInt(10000))
+        every { mockVerificationCodeRepository.save(any()) } returns VerificationCode(email, verificationCode)
+
+        When("인증번호 이메일이 성공적으로 전송된 경우") {
+            every {
+                mockNotificationFeignClient.sendEmailVerificationCode(any())
+            } returns ResponseEntity(HttpStatus.OK)
+
+            userService.requestPasswordReset(email)
+
+            Then("인증번호가 저장되어야 한다") {
+                verify { mockVerificationCodeRepository.save(any()) }
+            }
+        }
+
+        When("인증번호 이메일 전송이 실패한 경우") {
+            clearMocks(mockNotificationFeignClient, mockVerificationCodeRepository)
+            every {
+                mockNotificationFeignClient.sendEmailVerificationCode(any())
+            } returns ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
+
+            Then("인증번호는 저장되지 않아야 한다") {
+                shouldNotThrowAny {
+                    userService.requestPasswordReset(email)
+                }
+                verify(exactly = 0) { mockVerificationCodeRepository.save(any()) }
             }
         }
     }
