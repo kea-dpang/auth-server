@@ -24,6 +24,6 @@ interface TokenService {
      * 사용자의 리프레시 토큰을 입력받아 해당 토큰을 완전히 제거합니다.
      * 이 메서드는 로그아웃 및 회원 탈퇴 시 사용됩니다.
      */
-    fun removeToken(token: String)
+    fun removeToken(identifier: Long)
 
 }

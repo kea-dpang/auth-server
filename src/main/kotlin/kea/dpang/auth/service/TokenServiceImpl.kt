@@ -73,7 +73,7 @@ class TokenServiceImpl(
         }
     }
 
-    override fun removeToken(token: String) {
+    override fun removeToken(identifier: Long) {
         TODO("Not yet implemented")
     }
 }
