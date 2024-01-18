@@ -11,5 +11,5 @@ import org.springframework.web.bind.annotation.RequestBody
 fun interface NotificationFeignClient {
 
     @PostMapping("/api/notifications/email")
-    fun sendEmailVerificationCode(@RequestBody dto: EmailNotificationDto) : ResponseEntity<Any>
+    fun sendEmailVerificationCode(@RequestBody dto: EmailNotificationDto) : ResponseEntity<String>
 }
