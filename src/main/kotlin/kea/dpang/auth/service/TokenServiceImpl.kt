@@ -35,12 +35,12 @@ class TokenServiceImpl(
         // JWT 토큰을 생성한다.
         val jwtToken = jwtTokenProvider.createTokens(authentication, identifier)
 
-        // 이미 Redis에 해당 사용자의 리프레시 토큰이 존재한다면 삭제합니다.
+        // 이미 Redis에 해당 사용자의 리프레시 토큰이 존재한다면 삭제한다.
         if (tokenRepository.existsById(identifier)) {
             tokenRepository.deleteById(identifier)
         }
 
-        // Redis에 새로운 리프레시 토큰을 저장합니다.
+        // Redis에 새로운 리프레시 토큰을 저장한다.
         val refreshToken = RefreshToken(identifier, jwtToken.refreshToken)
         tokenRepository.save(refreshToken)
 
@@ -65,10 +65,18 @@ class TokenServiceImpl(
             val authentication: Authentication =
                 UsernamePasswordAuthenticationToken(user.email, user.password, authorities)
 
-            // 리프레시 토큰 파기
+            // Redis에 저장된 기존 리프레시 토큰을 파기한다.
             tokenRepository.deleteById(userIdx)
 
-            return jwtTokenProvider.createTokens(authentication, userIdx)
+            // JWT 토큰을 생성한다.
+            val jwtToken = jwtTokenProvider.createTokens(authentication, userIdx)
+
+            // Redis에 새로운 리프레시 토큰을 저장한다.
+            val refreshToken = RefreshToken(userIdx, jwtToken.refreshToken)
+            tokenRepository.save(refreshToken)
+
+            // 생성된 리프레시 토큰을 반환한다.
+            return jwtToken
 
         } else {
             throw InvalidRefreshTokenException(accessToken)
