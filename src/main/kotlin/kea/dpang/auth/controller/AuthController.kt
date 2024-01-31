@@ -1,8 +1,12 @@
 package kea.dpang.auth.controller
 
 import kea.dpang.auth.base.BaseResponse
+import kea.dpang.auth.base.SuccessResponse
 import kea.dpang.auth.dto.ChangePasswordRequestDto
+import kea.dpang.auth.dto.LoginRequestDto
 import kea.dpang.auth.dto.ResetPasswordRequestDto
+import kea.dpang.auth.dto.Token
+import kea.dpang.auth.service.TokenService
 import kea.dpang.auth.service.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -11,7 +15,8 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/api/auth")
 class AuthController(
-    private val userService: UserService
+    private val userService: UserService,
+    private val tokenService: TokenService
 ) {
 
     @PostMapping("/send-verification-code")
@@ -66,4 +71,20 @@ class AuthController(
 
         return ResponseEntity<BaseResponse>(baseResponse, HttpStatus.OK)
     }
+
+    @PostMapping("/login")
+    fun login(
+        @RequestBody loginRequestDto: LoginRequestDto
+    ): ResponseEntity<SuccessResponse<Token>> {
+
+        val userId = userService.verifyUser(
+            loginRequestDto.email,
+            loginRequestDto.password
+        )
+
+        val token = tokenService.createToken(userId)
+
+        return ResponseEntity.ok(SuccessResponse(HttpStatus.OK.value(), "로그인에 성공하였습니다.", token))
+    }
+
 }
