@@ -27,9 +27,17 @@ class UserServiceImpl(
     private val passwordEncoder: PasswordEncoder
 ) : UserService {
 
-    override fun register(email: String, password: String, role: Role, name: String, employeeNumber: String, joinDate: LocalDate) {
+    override fun register(
+        email: String,
+        password: String,
+        role: Role,
+        name: String,
+        employeeNumber: String,
+        joinDate: LocalDate
+    ) {
         // 이메일 중복 확인
         if (userRepository.existsByEmail(email)) {
+            logger.error("이미 존재하는 이메일: $email")
             throw EmailAlreadyExistsException(email)
         }
 
@@ -46,22 +54,27 @@ class UserServiceImpl(
         // 사용자 정보 저장
         userRepository.save(user)
 
-        TODO("이메일, 이름, 사번, 입사일을 사용자 서버에 전송해서 사용자 정보 저장")
+        logger.info("사용자 정보 저장 완료: $email")
+
+        // Todo: 이메일, 이름, 사번, 입사일을 사용자 서버에 전송해서 사용자 정보 저장
 
     }
 
     override fun verifyUser(email: String, password: String): Long {
         // 이메일로 사용자 조회
         val user = userRepository.findByEmail(email).orElseThrow {
+            logger.error("해당 이메일을 가진 사용자를 찾을 수 없음: $email")
             UserNotFoundException(email)
         }
 
         // 입력받은 비밀번호와 저장된 비밀번호 비교
         if (!passwordEncoder.matches(password, user.password)) {
+            logger.error("비밀번호 불일치: $email")
             throw InvalidPasswordException(email)
         }
 
         // 비밀번호가 일치하면 사용자의 고유 식별자 반환
+        logger.info("사용자 인증 완료: $email")
         return user.userIdx!!
     }
 
@@ -78,10 +91,12 @@ class UserServiceImpl(
             )
 
             // 이메일 전송
+            logger.info("비밀번호 재설정 인증번호 전송 요청. 이메일: $email")
             val response = notificationFeignClient.sendEmailVerificationCode(dto)
 
             // 이메일 전송이 성공하면 인증번호 저장
             if (response.statusCode.is2xxSuccessful) {
+                logger.info("비밀번호 재설정 인증번호 전송 완료. 이메일: $email")
 
                 // 인증번호 저장을 위한 VerificationCode 객체 생성
                 val verificationCodeEntity = VerificationCode(
@@ -91,6 +106,8 @@ class UserServiceImpl(
 
                 // 인증번호 저장
                 verificationCodeRepository.save(verificationCodeEntity)
+
+                logger.info("비밀번호 재설정 인증번호 저장 완료. 이메일: $email")
             }
 
         } catch (e: Exception) {
@@ -102,16 +119,19 @@ class UserServiceImpl(
     override fun resetPassword(email: String, code: String, newPassword: String) {
         // 이메일로 사용자 조회
         val user = userRepository.findByEmail(email).orElseThrow {
+            logger.error("해당 이메일을 가진 사용자를 찾을 수 없음: $email")
             UserNotFoundException(email)
         }
 
         // 이메일로 인증 코드 조회
         val storedCode = verificationCodeRepository.findById(email).orElseThrow {
+            logger.error("해당 이메일을 가진 사용자의 인증 코드를 찾을 수 없음: $email")
             VerificationCodeNotFoundException(email)
         }
 
         // 입력받은 인증 코드와 저장된 인증 코드 비교
         if (storedCode.code != code) {
+            logger.error("인증 코드 불일치: $email")
             throw InvalidVerificationCodeException(email)
         }
 
@@ -120,6 +140,8 @@ class UserServiceImpl(
 
         // 인증 코드 삭제
         verificationCodeRepository.delete(storedCode)
+
+        logger.info("비밀번호 재설정 완료: $email")
     }
 
     override fun changePassword(email: String, oldPassword: String, newPassword: String) {
