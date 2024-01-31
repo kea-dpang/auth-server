@@ -1,5 +1,6 @@
 package kea.dpang.auth.feign
 
+import kea.dpang.auth.base.BaseResponse
 import kea.dpang.auth.feign.dto.EmailNotificationDto
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.http.ResponseEntity
@@ -11,5 +12,5 @@ import org.springframework.web.bind.annotation.RequestBody
 fun interface NotificationFeignClient {
 
     @PostMapping("/api/notifications/email")
-    fun sendEmailVerificationCode(@RequestBody dto: EmailNotificationDto) : ResponseEntity<String>
+    fun sendEmailVerificationCode(@RequestBody dto: EmailNotificationDto) : ResponseEntity<BaseResponse>
 }
