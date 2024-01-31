@@ -142,8 +142,9 @@ class UserServiceImpl(
         logger.info("비밀번호 변경 완료: $email")
     }
 
-    override fun deleteAccount(identifier: Int) {
-        TODO("Not yet implemented")
+    override fun deleteAccount(userId: Long) {
+        userRepository.deleteById(userId)
+        logger.info("사용자 계정이 성공적으로 삭제되었습니다. 사용자 ID: {}", userId)
     }
 
     companion object {

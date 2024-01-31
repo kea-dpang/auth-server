@@ -118,6 +118,17 @@ class AuthController(
         return ResponseEntity<BaseResponse>(baseResponse, HttpStatus.CREATED)
     }
 
-    // Todo: 토큰 만료
+    @DeleteMapping("/users/{id}")
+    fun deleteUser(@PathVariable id: Long): ResponseEntity<BaseResponse> {
+        userService.deleteAccount(id)
+        tokenService.removeToken(id)
+
+        val baseResponse = BaseResponse(
+            status = HttpStatus.NO_CONTENT.value(),
+            message = "회원 탈퇴가 성공적으로 완료되었습니다."
+        )
+
+        return ResponseEntity(baseResponse, HttpStatus.NO_CONTENT)
+    }
 
 }
