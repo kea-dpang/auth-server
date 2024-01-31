@@ -52,8 +52,13 @@ dependencies {
     // MySQL
     runtimeOnly("com.mysql:mysql-connector-j")
 
+    // Kotlin
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+
+    // Swagger
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-api:2.1.0")
 }
 
 dependencyManagement {
