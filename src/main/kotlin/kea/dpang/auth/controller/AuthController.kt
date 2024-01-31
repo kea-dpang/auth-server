@@ -1,6 +1,7 @@
 package kea.dpang.auth.controller
 
 import kea.dpang.auth.base.BaseResponse
+import kea.dpang.auth.dto.ChangePasswordRequestDto
 import kea.dpang.auth.dto.ResetPasswordRequestDto
 import kea.dpang.auth.service.UserService
 import org.springframework.http.HttpStatus
@@ -37,6 +38,25 @@ class AuthController(
             resetPasswordRequestDto.email,
             resetPasswordRequestDto.code,
             resetPasswordRequestDto.newPassword
+        )
+
+        val baseResponse = BaseResponse(
+            status = HttpStatus.OK.value(),
+            message = "비밀번호가 성공적으로 변경되었습니다."
+        )
+
+        return ResponseEntity<BaseResponse>(baseResponse, HttpStatus.OK)
+    }
+
+    @PostMapping("/change-password")
+    fun changePassword(
+        @RequestBody changePasswordRequestDto: ChangePasswordRequestDto
+    ): ResponseEntity<BaseResponse> {
+
+        userService.changePassword(
+            changePasswordRequestDto.email,
+            changePasswordRequestDto.oldPassword,
+            changePasswordRequestDto.newPassword
         )
 
         val baseResponse = BaseResponse(
