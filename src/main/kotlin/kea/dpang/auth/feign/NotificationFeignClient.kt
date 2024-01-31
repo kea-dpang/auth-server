@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 
 
-@FeignClient(name = "notificationService", url = "\${services.notification.url}")
+@FeignClient(name = "notification-server")
 fun interface NotificationFeignClient {
 
     @PostMapping("/api/notifications/email")
