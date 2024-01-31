@@ -1,5 +1,6 @@
 package kea.dpang.auth.controller
 
+import io.swagger.v3.oas.annotations.Operation
 import kea.dpang.auth.base.BaseResponse
 import kea.dpang.auth.base.Role
 import kea.dpang.auth.base.SuccessResponse
@@ -18,6 +19,7 @@ class AuthController(
 ) {
 
     @PostMapping("/send-verification-code")
+    @Operation(summary = "인증코드 전송", description = "비밀번호 재설정을 위한 인증코드를 전송합니다.")
     fun sendVerificationCode(
         @RequestParam email: String
     ): ResponseEntity<BaseResponse> {
@@ -33,6 +35,7 @@ class AuthController(
     }
 
     @PostMapping("/reset-password")
+    @Operation(summary = "비밀번호 재설정", description = "인증코드를 확인하고 일치하는 경우 새로운 비밀번호로 재설정합니다.")
     fun resetPassword(
         @RequestBody resetPasswordRequestDto: ResetPasswordRequestDto
     ): ResponseEntity<BaseResponse> {
@@ -52,6 +55,7 @@ class AuthController(
     }
 
     @PostMapping("/change-password")
+    @Operation(summary = "비밀번호 변경", description = "현재 비밀번호를 확인하고 일치하는 경우 새로운 비밀번호로 변경합니다.")
     fun changePassword(
         @RequestBody changePasswordRequestDto: ChangePasswordRequestDto
     ): ResponseEntity<BaseResponse> {
@@ -71,6 +75,7 @@ class AuthController(
     }
 
     @PostMapping("/login")
+    @Operation(summary = "로그인", description = "이메일과 비밀번호를 입력받아 로그인합니다.")
     fun login(
         @RequestBody loginRequestDto: LoginRequestDto
     ): ResponseEntity<SuccessResponse<Token>> {
@@ -87,6 +92,7 @@ class AuthController(
     }
 
     @PostMapping("/renew-token")
+    @Operation(summary = "토큰 갱신", description = "기존 토큰을 갱신합니다.")
     fun renewToken(
         @RequestBody renewTokenRequestDto: RenewTokenRequestDto
     ): ResponseEntity<SuccessResponse<Token>> {
@@ -97,6 +103,7 @@ class AuthController(
     }
 
     @PostMapping("/join")
+    @Operation(summary = "회원가입", description = "회원가입을 진행합니다.")
     fun join(
         @RequestBody registerRequestDto: RegisterRequestDto
     ): ResponseEntity<BaseResponse> {
@@ -119,6 +126,7 @@ class AuthController(
     }
 
     @DeleteMapping("/users/{id}")
+    @Operation(summary = "회원 탈퇴", description = "회원 탈퇴를 진행합니다. 해당 API는 회원 탈퇴 시 사용자 서버에서 호출됩니다.")
     fun deleteUser(@PathVariable id: Long): ResponseEntity<BaseResponse> {
         userService.deleteAccount(id)
         tokenService.removeToken(id)
