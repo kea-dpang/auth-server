@@ -36,6 +36,13 @@ class SecurityConfig {
             .logout { it.disable() } // 로그아웃 기능 비활성화.
             .authorizeHttpRequests { request ->
                 request
+                    .requestMatchers("/api/auth/send-verification-code").permitAll()
+                    .requestMatchers("/api/auth/reset-password").permitAll()
+                    .requestMatchers("/api/auth/change-password").authenticated()
+                    .requestMatchers("/api/auth/login").permitAll()
+                    .requestMatchers("/api/auth/renew-token").permitAll()
+                    .requestMatchers("/api/auth/join").permitAll()
+                    .requestMatchers("/api/auth/users/**").permitAll()
                     .anyRequest().authenticated()
             }
             .build()
