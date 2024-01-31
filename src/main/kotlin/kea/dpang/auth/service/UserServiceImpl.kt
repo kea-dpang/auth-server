@@ -81,7 +81,7 @@ class UserServiceImpl(
         }
     }
 
-    override fun verifyCodeAndResetPassword(email: String, code: String, newPassword: String) {
+    override fun resetPassword(email: String, code: String, newPassword: String) {
         // 이메일로 사용자 조회
         val user = userRepository.findByEmail(email).orElseThrow {
             UserNotFoundException(email)

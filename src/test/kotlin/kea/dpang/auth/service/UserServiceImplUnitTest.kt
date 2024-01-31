@@ -118,7 +118,7 @@ class UserServiceImplUnitTest : BehaviorSpec({
         every { mockVerificationCodeRepository.delete(any()) } just Runs
 
         When("입력받은 인증 코드가 저장된 인증 코드와 일치하는 경우") {
-            userService.verifyCodeAndResetPassword(email, code, newPassword)
+            userService.resetPassword(email, code, newPassword)
 
             Then("비밀번호가 성공적으로 재설정되어야 한다") {
                 verify { mockVerificationCodeRepository.delete(verificationCode) }
@@ -131,7 +131,7 @@ class UserServiceImplUnitTest : BehaviorSpec({
 
             Then("InvalidVerificationCodeException이 발생해야 한다") {
                 shouldThrow<InvalidVerificationCodeException> {
-                    userService.verifyCodeAndResetPassword(email, wrongCode, newPassword)
+                    userService.resetPassword(email, wrongCode, newPassword)
                 }
             }
         }
@@ -141,7 +141,7 @@ class UserServiceImplUnitTest : BehaviorSpec({
 
             Then("VerificationCodeNotFoundException이 발생해야 한다") {
                 shouldThrow<VerificationCodeNotFoundException> {
-                    userService.verifyCodeAndResetPassword(email, code, newPassword)
+                    userService.resetPassword(email, code, newPassword)
                 }
             }
         }
@@ -151,7 +151,7 @@ class UserServiceImplUnitTest : BehaviorSpec({
 
             Then("UserNotFoundException이 발생해야 한다") {
                 shouldThrow<UserNotFoundException> {
-                    userService.verifyCodeAndResetPassword(email, code, newPassword)
+                    userService.resetPassword(email, code, newPassword)
                 }
             }
         }

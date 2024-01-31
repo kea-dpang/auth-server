@@ -35,7 +35,7 @@ interface UserService {
      * 사용자의 이메일, 인증번호, 새로운 비밀번호를 입력받아 인증번호를 검증하고,
      * 인증번호가 유효한 경우 사용자의 비밀번호를 재설정합니다.
      */
-    fun verifyCodeAndResetPassword(email: String, code: String, newPassword: String)
+    fun resetPassword(email: String, code: String, newPassword: String)
 
     /**
      * 비밀번호 변경 메서드.
