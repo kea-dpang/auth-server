@@ -16,7 +16,8 @@ class GlobalExceptionHandler {
     @ExceptionHandler(
         InvalidPasswordException::class,
         InvalidRefreshTokenException::class,
-        InvalidVerificationCodeException::class
+        InvalidVerificationCodeException::class,
+        EmailAlreadyExistsException::class
     )
     fun handleBadRequestException(ex: RuntimeException, request: WebRequest): ResponseEntity<ErrorResponse> {
         return generateErrorResponse(ex, request, HttpStatus.BAD_REQUEST)

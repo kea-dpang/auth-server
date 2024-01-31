@@ -1,6 +1,7 @@
 package kea.dpang.auth.controller
 
 import kea.dpang.auth.base.BaseResponse
+import kea.dpang.auth.base.Role
 import kea.dpang.auth.base.SuccessResponse
 import kea.dpang.auth.dto.*
 import kea.dpang.auth.service.TokenService
@@ -81,6 +82,7 @@ class AuthController(
 
         val token = tokenService.createToken(userId)
 
+        // Todo 사용자 role도 추가 반환
         return ResponseEntity.ok(SuccessResponse(HttpStatus.OK.value(), "로그인에 성공하였습니다.", token))
     }
 
@@ -93,5 +95,29 @@ class AuthController(
 
         return ResponseEntity.ok(SuccessResponse(HttpStatus.OK.value(), "토큰이 성공적으로 갱신되었습니다.", token))
     }
+
+    @PostMapping("/join")
+    fun join(
+        @RequestBody registerRequestDto: RegisterRequestDto
+    ): ResponseEntity<BaseResponse> {
+
+        userService.register(
+            email = registerRequestDto.email,
+            password = registerRequestDto.password,
+            role = registerRequestDto.role ?: Role.USER,
+            name = registerRequestDto.name,
+            employeeNumber = registerRequestDto.employeeNumber,
+            joinDate = registerRequestDto.joinDate
+        )
+
+        val baseResponse = BaseResponse(
+            status = HttpStatus.CREATED.value(),
+            message = "회원가입이 성공적으로 완료되었습니다."
+        )
+
+        return ResponseEntity<BaseResponse>(baseResponse, HttpStatus.CREATED)
+    }
+
+    // Todo: 토큰 만료
 
 }

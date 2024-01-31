@@ -1,6 +1,7 @@
 package kea.dpang.auth.service
 
 import kea.dpang.auth.base.Role
+import java.time.LocalDate
 
 interface UserService {
 
@@ -11,7 +12,7 @@ interface UserService {
      * 권한을 별도로 지정하지 않은 경우, 기본적으로 'USER' 권한을 부여합니다.
      * 지정된 권한이 있는 경우, 해당 권한으로 계정을 생성합니다.
      */
-    fun register(email: String, password: String, role: Role = Role.USER)
+    fun register(email: String, password: String, role: Role, name: String, employeeNumber: String, joinDate: LocalDate)
 
     /**
      * 사용자 검증 메서드.

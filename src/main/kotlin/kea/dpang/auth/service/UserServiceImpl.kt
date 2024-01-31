@@ -1,11 +1,9 @@
 package kea.dpang.auth.service
 
 import kea.dpang.auth.base.Role
+import kea.dpang.auth.entity.User
+import kea.dpang.auth.exception.*
 import kea.dpang.auth.feign.dto.EmailNotificationDto
-import kea.dpang.auth.exception.InvalidPasswordException
-import kea.dpang.auth.exception.InvalidVerificationCodeException
-import kea.dpang.auth.exception.UserNotFoundException
-import kea.dpang.auth.exception.VerificationCodeNotFoundException
 import kea.dpang.auth.feign.NotificationFeignClient
 import kea.dpang.auth.redis.entity.VerificationCode
 import kea.dpang.auth.redis.repository.VerificationCodeRepository
@@ -14,6 +12,7 @@ import lombok.extern.slf4j.Slf4j
 import org.slf4j.LoggerFactory
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import java.time.LocalDate
 import kotlin.random.Random
 
 // Todo: Redis, Database등 서비스간의 연결 상태가 불안할 때의 처리
@@ -28,8 +27,27 @@ class UserServiceImpl(
     private val passwordEncoder: PasswordEncoder
 ) : UserService {
 
-    override fun register(email: String, password: String, role: Role) {
-        TODO("Not yet implemented")
+    override fun register(email: String, password: String, role: Role, name: String, employeeNumber: String, joinDate: LocalDate) {
+        // 이메일 중복 확인
+        if (userRepository.existsByEmail(email)) {
+            throw EmailAlreadyExistsException(email)
+        }
+
+        // 비밀번호 암호화
+        val encodedPassword = passwordEncoder.encode(password)
+
+        // 사용자 정보 저장을 위한 User 객체 생성
+        val user = User(
+            email = email,
+            password = encodedPassword,
+            role = role
+        )
+
+        // 사용자 정보 저장
+        userRepository.save(user)
+
+        TODO("이메일, 이름, 사번, 입사일을 사용자 서버에 전송해서 사용자 정보 저장")
+
     }
 
     override fun verifyUser(email: String, password: String): Long {
