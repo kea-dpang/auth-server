@@ -1,1 +1,14 @@
+spring:
+  config:
+    import: classpath:secret.yml
 
+  jpa:
+    hibernate:
+      ddl-auto: create
+
+  main:
+    allow-bean-definition-overriding: true
+
+logging:
+  level:
+    kea.dpang.auth.feign.*: DEBUG
