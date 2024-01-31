@@ -2,10 +2,7 @@ package kea.dpang.auth.controller
 
 import kea.dpang.auth.base.BaseResponse
 import kea.dpang.auth.base.SuccessResponse
-import kea.dpang.auth.dto.ChangePasswordRequestDto
-import kea.dpang.auth.dto.LoginRequestDto
-import kea.dpang.auth.dto.ResetPasswordRequestDto
-import kea.dpang.auth.dto.Token
+import kea.dpang.auth.dto.*
 import kea.dpang.auth.service.TokenService
 import kea.dpang.auth.service.UserService
 import org.springframework.http.HttpStatus
@@ -85,6 +82,16 @@ class AuthController(
         val token = tokenService.createToken(userId)
 
         return ResponseEntity.ok(SuccessResponse(HttpStatus.OK.value(), "로그인에 성공하였습니다.", token))
+    }
+
+    @PostMapping("/renew-token")
+    fun renewToken(
+        @RequestBody renewTokenRequestDto: RenewTokenRequestDto
+    ): ResponseEntity<SuccessResponse<Token>> {
+
+        val token = tokenService.refreshToken(renewTokenRequestDto.accessToken)
+
+        return ResponseEntity.ok(SuccessResponse(HttpStatus.OK.value(), "토큰이 성공적으로 갱신되었습니다.", token))
     }
 
 }
