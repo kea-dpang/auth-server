@@ -1,4 +1,4 @@
-package kea.dpang.auth.dto.feign
+package kea.dpang.auth.feign.dto
 
 data class EmailNotificationDto(
     val to: String,  // 이메일 보내는 대상

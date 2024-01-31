@@ -1,6 +1,6 @@
 package kea.dpang.auth.feign
 
-import kea.dpang.auth.dto.feign.EmailNotificationDto
+import kea.dpang.auth.feign.dto.EmailNotificationDto
 import org.springframework.cloud.openfeign.FeignClient
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping

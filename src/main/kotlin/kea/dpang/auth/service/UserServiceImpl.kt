@@ -1,7 +1,7 @@
 package kea.dpang.auth.service
 
 import kea.dpang.auth.base.Role
-import kea.dpang.auth.dto.feign.EmailNotificationDto
+import kea.dpang.auth.feign.dto.EmailNotificationDto
 import kea.dpang.auth.exception.InvalidPasswordException
 import kea.dpang.auth.exception.InvalidVerificationCodeException
 import kea.dpang.auth.exception.UserNotFoundException
