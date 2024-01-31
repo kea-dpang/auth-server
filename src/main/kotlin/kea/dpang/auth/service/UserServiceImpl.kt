@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j
 import org.slf4j.LoggerFactory
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 import kotlin.random.Random
 
@@ -27,6 +28,7 @@ class UserServiceImpl(
     private val passwordEncoder: PasswordEncoder
 ) : UserService {
 
+    @Transactional
     override fun register(
         email: String,
         password: String,
@@ -60,6 +62,7 @@ class UserServiceImpl(
 
     }
 
+    @Transactional(readOnly = true)
     override fun verifyUser(email: String, password: String): Long {
         // 이메일로 사용자 조회
         val user = userRepository.findByEmail(email).orElseThrow {
@@ -78,6 +81,7 @@ class UserServiceImpl(
         return user.userIdx!!
     }
 
+    @Transactional
     override fun requestPasswordReset(email: String) {
         try {
             // 자연수 4자리 인증번호 생성 (0부터 9999까지)
@@ -116,6 +120,7 @@ class UserServiceImpl(
         }
     }
 
+    @Transactional
     override fun resetPassword(email: String, code: String, newPassword: String) {
         // 이메일로 사용자 조회
         val user = userRepository.findByEmail(email).orElseThrow {
@@ -144,6 +149,7 @@ class UserServiceImpl(
         logger.info("비밀번호 재설정 완료: $email")
     }
 
+    @Transactional
     override fun changePassword(email: String, oldPassword: String, newPassword: String) {
         logger.info("비밀번호 변경 요청. 이메일: $email")
 
@@ -164,6 +170,7 @@ class UserServiceImpl(
         logger.info("비밀번호 변경 완료: $email")
     }
 
+    @Transactional
     override fun deleteAccount(userId: Long) {
         userRepository.deleteById(userId)
         logger.info("사용자 계정이 성공적으로 삭제되었습니다. 사용자 ID: {}", userId)
