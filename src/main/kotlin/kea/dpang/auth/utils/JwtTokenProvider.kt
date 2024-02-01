@@ -48,7 +48,7 @@ class JwtTokenProvider @Autowired constructor(
         // 생성된 액세스 토큰과 리프레시 토큰을 포함하는 Token 객체를 반환한다.
         return Token(
             accessToken = createAccessToken(authentication, userIdx),
-            refreshToken = createRefreshToken(authentication)
+            refreshToken = createRefreshToken(authentication, userIdx)
         )
     }
 
@@ -98,23 +98,24 @@ class JwtTokenProvider @Autowired constructor(
      * @return 생성된 JWT 리프레시 토큰
      */
     @Throws(Exception::class)
-    fun createRefreshToken(authentication: Authentication): String {
+    fun createRefreshToken(authentication: Authentication, userIdx: Long): String {
         return Jwts.builder()
             .subject(authentication.name) // sub 클레임: 토큰 제목을 지정
             .issuer("DPANG-AUTH-SERVER") // iss 클레임: 토큰 발급자를 지정
             .issuedAt(Date()) // iat 클레임: 토큰 발급 시간을 지정
             .expiration(Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRE_TIME)) // exp 클레임: 토큰 만료 시간을 지정
+            .claim("client-id", userIdx) // 사용자 정의 클레임: 사용자의 식별자
             .signWith(secretKey) // signWith 메소드를 사용해 서명 알고리즘과 키를 지정
             .compact() // 마지막으로 compact 메소드를 호출해 모든 부분을 합쳐서 하나의 JWT 토큰 문자열을 생성한다
     }
 
     /**
-     * Access token에서 식별자를 추출하는 메소드
+     * Token에서 식별자를 추출하는 메소드
      *
      * @param token Access token
      * @return 토큰에서 추출된 식별자
      */
-    fun getClientIdFromAccessToken(token: String?): Long? {
+    fun getClientIdFromToken(token: String?): Long? {
         // JJWT에서 제공하는 parserBuilder를 통해 JwtParser를 생성
         val jwtParser: JwtParser = Jwts.parser()
             .verifyWith(secretKey)

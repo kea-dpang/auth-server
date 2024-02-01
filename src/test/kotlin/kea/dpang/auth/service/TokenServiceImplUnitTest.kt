@@ -101,7 +101,7 @@ class TokenServiceImplUnitTest : BehaviorSpec({
         val user = User(userIdx, "test@email.com", "password", Role.USER)
         val refreshToken = RefreshToken(userIdx, token)
 
-        every { mockJwtTokenProvider.getClientIdFromAccessToken(token) } returns userIdx
+        every { mockJwtTokenProvider.getClientIdFromToken(token) } returns userIdx
         every { mockUserRepository.findById(userIdx) } returns Optional.of(user)
         every { mockRefreshTokenRepository.findById(userIdx) } returns Optional.of(refreshToken)
         every { mockJwtTokenProvider.createTokens(any(), any()) } returns Token("new_access_token", "new_refresh_token")
@@ -122,7 +122,7 @@ class TokenServiceImplUnitTest : BehaviorSpec({
         val invalidUserIdx = 2L
         val invalidToken = "invalid_refresh_token"
 
-        every { mockJwtTokenProvider.getClientIdFromAccessToken(invalidToken) } returns invalidUserIdx
+        every { mockJwtTokenProvider.getClientIdFromToken(invalidToken) } returns invalidUserIdx
         every { mockUserRepository.findById(invalidUserIdx) } returns Optional.empty()
 
         When("토큰 재발급을 요청하면") {
@@ -139,7 +139,7 @@ class TokenServiceImplUnitTest : BehaviorSpec({
         val invalidToken = "invalid_refresh_token"
         val user = User(invalidUserIdx, "test2@email.com", "password", Role.USER)
 
-        every { mockJwtTokenProvider.getClientIdFromAccessToken(invalidToken) } returns invalidUserIdx
+        every { mockJwtTokenProvider.getClientIdFromToken(invalidToken) } returns invalidUserIdx
         every { mockUserRepository.findById(invalidUserIdx) } returns Optional.of(user)
         every { mockRefreshTokenRepository.findById(invalidUserIdx) } returns Optional.empty()
 
@@ -159,7 +159,7 @@ class TokenServiceImplUnitTest : BehaviorSpec({
         val user = User(userIdx, "test3@email.com", "password", Role.USER)
         val refreshToken = RefreshToken(userIdx, serverToken)
 
-        every { mockJwtTokenProvider.getClientIdFromAccessToken(clientToken) } returns userIdx
+        every { mockJwtTokenProvider.getClientIdFromToken(clientToken) } returns userIdx
         every { mockUserRepository.findById(userIdx) } returns Optional.of(user)
         every { mockRefreshTokenRepository.findById(userIdx) } returns Optional.of(refreshToken)
 
