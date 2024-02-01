@@ -12,7 +12,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer
 
 @EnableCaching
 @Configuration
-@EnableRedisRepositories(basePackages = arrayOf("kea.dpang.auth.redis.repository"))
+@EnableRedisRepositories(basePackages = ["kea.dpang.auth.redis.repository"])
 class RedisConfig {
 
     @Value("\${spring.data.redis.cluster.nodes}")
