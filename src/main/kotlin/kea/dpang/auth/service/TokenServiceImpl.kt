@@ -55,9 +55,9 @@ class TokenServiceImpl(
         return jwtToken
     }
 
-    override fun refreshToken(accessToken: String): Token {
-        // 액세스 토큰에서 사용자 ID를 추출한다.
-        val userIdx = jwtTokenProvider.getClientIdFromAccessToken(accessToken)!!
+    override fun refreshToken(refreshToken: String): Token {
+        // 리프래쉬 토큰에서 사용자 ID를 추출한다.
+        val userIdx = jwtTokenProvider.getClientIdFromToken(refreshToken)!!
         logger.info("사용자($userIdx) 토큰 재발급 요청")
 
         // MySQL에서 사용자 정보를 가져온다.
@@ -71,7 +71,7 @@ class TokenServiceImpl(
         logger.info("사용자($userIdx) 리프레시 토큰 조회 완료")
 
         // Redis의 리프레시 토큰과 클라이언트의 리프레시 토큰이 일치하면 기존 토큰을 파기하고 새로운 토큰을 발급한다.
-        if (refreshTokenInRedis.isPresent && refreshTokenInRedis.get().refreshToken == accessToken) {
+        if (refreshTokenInRedis.isPresent && refreshTokenInRedis.get().refreshToken == refreshToken) {
             logger.info("사용자($userIdx) 리프레시 토큰 일치")
 
             val authorities = listOf(SimpleGrantedAuthority(user.role.toString()))
@@ -87,8 +87,8 @@ class TokenServiceImpl(
             val jwtToken = jwtTokenProvider.createTokens(authentication, userIdx)
 
             // Redis에 새로운 리프레시 토큰을 저장한다.
-            val refreshToken = RefreshToken(userIdx, jwtToken.refreshToken)
-            tokenRepository.save(refreshToken)
+            val newRefreshToken = RefreshToken(userIdx, jwtToken.refreshToken)
+            tokenRepository.save(newRefreshToken)
 
             logger.info("사용자($userIdx) 리프레시 토큰 재발급 및 저장 완료")
 
@@ -96,7 +96,7 @@ class TokenServiceImpl(
             return jwtToken
 
         } else {
-            throw InvalidRefreshTokenException(accessToken)
+            throw InvalidRefreshTokenException(refreshToken)
         }
     }
 

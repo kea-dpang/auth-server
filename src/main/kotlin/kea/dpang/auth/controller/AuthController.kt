@@ -97,7 +97,7 @@ class AuthController(
         @RequestBody renewTokenRequestDto: RenewTokenRequestDto
     ): ResponseEntity<SuccessResponse<Token>> {
 
-        val token = tokenService.refreshToken(renewTokenRequestDto.accessToken)
+        val token = tokenService.refreshToken(renewTokenRequestDto.refreshToken)
 
         return ResponseEntity.ok(SuccessResponse(HttpStatus.OK.value(), "토큰이 성공적으로 갱신되었습니다.", token))
     }
