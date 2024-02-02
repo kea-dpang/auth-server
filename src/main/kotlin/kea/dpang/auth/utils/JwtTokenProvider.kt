@@ -4,6 +4,7 @@ import io.jsonwebtoken.JwtParser
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
+import kea.dpang.auth.base.Role
 import kea.dpang.auth.dto.Token
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -45,8 +46,15 @@ class JwtTokenProvider @Autowired constructor(
      */
     @Throws(Exception::class)
     fun createTokens(authentication: Authentication, userIdx: Long): Token {
+        // 사용자의 역할을 가져와서 Role 객체로 변환한다.
+        val roles = authentication.authorities.stream()
+            .map { authority -> Role.valueOf(authority.authority.uppercase()) }
+            .collect(Collectors.toList())
+            .first() // 사용자의 역할이 하나만 존재하기 때문에 첫 번째 역할만 사용한다. 추후 다중 역할을 지원할 경우 수정 필요
+
         // 생성된 액세스 토큰과 리프레시 토큰을 포함하는 Token 객체를 반환한다.
         return Token(
+            role = roles,
             accessToken = createAccessToken(authentication, userIdx),
             refreshToken = createRefreshToken(authentication, userIdx)
         )
