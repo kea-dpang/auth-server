@@ -3,7 +3,7 @@ package kea.dpang.auth.service
 import kea.dpang.auth.base.Role
 import kea.dpang.auth.entity.User
 import kea.dpang.auth.exception.*
-import kea.dpang.auth.feign.dto.EmailNotificationDto
+import kea.dpang.auth.feign.dto.EmailNotificationRequestDto
 import kea.dpang.auth.feign.NotificationServiceFeignClient
 import kea.dpang.auth.feign.UserServiceFeignClient
 import kea.dpang.auth.feign.dto.RegisterUserRequestDto
@@ -106,7 +106,7 @@ class UserServiceImpl(
             val verificationCode = String.format("%04d", Random.nextInt(10000))
 
             // 이메일 전송을 위한 DTO 객체 생성
-            val dto = EmailNotificationDto(
+            val dto = EmailNotificationRequestDto(
                 to = email,
                 title = "비밀번호 재설정 인증번호 안내",
                 body = "비밀번호 재설정을 위한 인증번호는 $verificationCode 입니다."
