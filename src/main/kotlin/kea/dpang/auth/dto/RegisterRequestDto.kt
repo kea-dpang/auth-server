@@ -8,6 +8,6 @@ data class RegisterRequestDto(
     val password: String,
     val role: Role?,
     val name: String,
-    val employeeNumber: String,
+    val employeeNumber: Long,
     val joinDate: LocalDate
 )

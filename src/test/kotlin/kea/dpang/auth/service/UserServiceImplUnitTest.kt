@@ -10,7 +10,7 @@ import kea.dpang.auth.exception.InvalidPasswordException
 import kea.dpang.auth.exception.InvalidVerificationCodeException
 import kea.dpang.auth.exception.UserNotFoundException
 import kea.dpang.auth.exception.VerificationCodeNotFoundException
-import kea.dpang.auth.feign.NotificationFeignClient
+import kea.dpang.auth.feign.NotificationServiceFeignClient
 import kea.dpang.auth.redis.entity.VerificationCode
 import kea.dpang.auth.redis.repository.VerificationCodeRepository
 import kea.dpang.auth.repository.UserRepository
@@ -21,12 +21,12 @@ import java.util.*
 import kotlin.random.Random
 
 class UserServiceImplUnitTest : BehaviorSpec({
-    val mockNotificationFeignClient = mockk<NotificationFeignClient>()
+    val mockNotificationServiceFeignClient = mockk<NotificationServiceFeignClient>()
     val mockUserRepository = mockk<UserRepository>()
     val mockVerificationCodeRepository = mockk<VerificationCodeRepository>()
     val mockPasswordEncoder = mockk<PasswordEncoder>()
     val userService = UserServiceImpl(
-        mockNotificationFeignClient,
+        mockNotificationServiceFeignClient,
         mockUserRepository,
         mockVerificationCodeRepository,
         mockPasswordEncoder
@@ -78,7 +78,7 @@ class UserServiceImplUnitTest : BehaviorSpec({
 
         When("인증번호 이메일이 성공적으로 전송된 경우") {
             every {
-                mockNotificationFeignClient.sendEmailVerificationCode(any())
+                mockNotificationServiceFeignClient.sendEmailVerificationCode(any())
             } returns ResponseEntity(HttpStatus.OK)
 
             userService.requestPasswordReset(email)
@@ -89,9 +89,9 @@ class UserServiceImplUnitTest : BehaviorSpec({
         }
 
         When("인증번호 이메일 전송이 실패한 경우") {
-            clearMocks(mockNotificationFeignClient, mockVerificationCodeRepository)
+            clearMocks(mockNotificationServiceFeignClient, mockVerificationCodeRepository)
             every {
-                mockNotificationFeignClient.sendEmailVerificationCode(any())
+                mockNotificationServiceFeignClient.sendEmailVerificationCode(any())
             } returns ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR)
 
             Then("인증번호는 저장되지 않아야 한다") {
