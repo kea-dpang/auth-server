@@ -5,6 +5,8 @@ import kea.dpang.auth.entity.User
 import kea.dpang.auth.exception.*
 import kea.dpang.auth.feign.dto.EmailNotificationDto
 import kea.dpang.auth.feign.NotificationServiceFeignClient
+import kea.dpang.auth.feign.UserServiceFeignClient
+import kea.dpang.auth.feign.dto.RegisterUserRequestDto
 import kea.dpang.auth.redis.entity.VerificationCode
 import kea.dpang.auth.redis.repository.VerificationCodeRepository
 import kea.dpang.auth.repository.UserRepository
@@ -23,6 +25,7 @@ import kotlin.random.Random
 @Service
 class UserServiceImpl(
     private val notificationServiceFeignClient: NotificationServiceFeignClient,
+    private val userServiceFeignClient: UserServiceFeignClient,
     private val userRepository: UserRepository,
     private val verificationCodeRepository: VerificationCodeRepository,
     private val passwordEncoder: PasswordEncoder
@@ -34,7 +37,7 @@ class UserServiceImpl(
         password: String,
         role: Role,
         name: String,
-        employeeNumber: String,
+        employeeNumber: Long,
         joinDate: LocalDate
     ) {
         // 이메일 중복 확인
@@ -58,8 +61,15 @@ class UserServiceImpl(
 
         logger.info("사용자 정보 저장 완료: $email")
 
-        // Todo: 이메일, 이름, 사번, 입사일을 사용자 서버에 전송해서 사용자 정보 저장
+        // 사용자 정보를 사용자 서버로 전달해 사용자 생성
+        userServiceFeignClient.registerUser(RegisterUserRequestDto(
+            email = email,
+            employeeNumber = employeeNumber,
+            name = name,
+            joinDate = joinDate
+        ))
 
+        logger.info("사용자 생성 완료: $email")
     }
 
     @Transactional(readOnly = true)
