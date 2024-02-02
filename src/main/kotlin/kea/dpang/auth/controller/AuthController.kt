@@ -78,7 +78,7 @@ class AuthController(
     @Operation(summary = "로그인", description = "이메일과 비밀번호를 입력받아 로그인합니다.")
     fun login(
         @RequestBody loginRequestDto: LoginRequestDto
-    ): ResponseEntity<SuccessResponse<Token>> {
+    ): ResponseEntity<SuccessResponse<LoginResponseDto>> {
 
         val userId = userService.verifyUser(
             loginRequestDto.email,
@@ -87,7 +87,12 @@ class AuthController(
 
         val token = tokenService.createToken(userId)
 
-        return ResponseEntity.ok(SuccessResponse(HttpStatus.OK.value(), "로그인에 성공하였습니다.", token))
+        val loginResponseDto = LoginResponseDto(
+            userIdx = userId,
+            token = token
+        )
+
+        return ResponseEntity.ok(SuccessResponse(HttpStatus.OK.value(), "로그인에 성공하였습니다.", loginResponseDto))
     }
 
     @PostMapping("/renew-token")
