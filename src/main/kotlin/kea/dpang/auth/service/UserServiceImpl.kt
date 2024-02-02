@@ -4,7 +4,7 @@ import kea.dpang.auth.base.Role
 import kea.dpang.auth.entity.User
 import kea.dpang.auth.exception.*
 import kea.dpang.auth.feign.dto.EmailNotificationDto
-import kea.dpang.auth.feign.NotificationFeignClient
+import kea.dpang.auth.feign.NotificationServiceFeignClient
 import kea.dpang.auth.redis.entity.VerificationCode
 import kea.dpang.auth.redis.repository.VerificationCodeRepository
 import kea.dpang.auth.repository.UserRepository
@@ -22,7 +22,7 @@ import kotlin.random.Random
 @Slf4j
 @Service
 class UserServiceImpl(
-    private val notificationFeignClient: NotificationFeignClient,
+    private val notificationServiceFeignClient: NotificationServiceFeignClient,
     private val userRepository: UserRepository,
     private val verificationCodeRepository: VerificationCodeRepository,
     private val passwordEncoder: PasswordEncoder
@@ -104,7 +104,7 @@ class UserServiceImpl(
 
             // 이메일 전송
             logger.info("비밀번호 재설정 인증번호 전송 요청. 이메일: $email")
-            val response = notificationFeignClient.sendEmailVerificationCode(dto)
+            val response = notificationServiceFeignClient.sendEmailVerificationCode(dto)
 
             // 이메일 전송이 성공하면 인증번호 저장
             if (response.statusCode.is2xxSuccessful) {

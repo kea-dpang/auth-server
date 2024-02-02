@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody
 
 
 @FeignClient(name = "notification-server")
-fun interface NotificationFeignClient {
+fun interface NotificationServiceFeignClient {
 
     @PostMapping("/api/notifications/email")
     fun sendEmailVerificationCode(@RequestBody dto: EmailNotificationDto) : ResponseEntity<BaseResponse>
