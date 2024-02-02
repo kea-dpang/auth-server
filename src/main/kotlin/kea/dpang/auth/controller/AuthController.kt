@@ -87,7 +87,6 @@ class AuthController(
 
         val token = tokenService.createToken(userId)
 
-        // Todo 사용자 role도 추가 반환
         return ResponseEntity.ok(SuccessResponse(HttpStatus.OK.value(), "로그인에 성공하였습니다.", token))
     }
 

@@ -64,6 +64,16 @@ class UserServiceImpl(
 
     @Transactional(readOnly = true)
     override fun verifyUser(email: String, password: String): Long {
+        // 사용자 인증
+        val user = findUserByEmailAndPassword(email, password)
+
+        // 비밀번호가 일치하면 사용자의 고유 식별자 반환
+        logger.info("사용자 인증 완료: $email")
+        return user.userIdx!!
+    }
+
+    @Transactional(readOnly = true)
+    fun findUserByEmailAndPassword(email: String, password: String): User {
         // 이메일로 사용자 조회
         val user = userRepository.findByEmail(email).orElseThrow {
             logger.error("해당 이메일을 가진 사용자를 찾을 수 없음: $email")
@@ -76,9 +86,7 @@ class UserServiceImpl(
             throw InvalidPasswordException(email)
         }
 
-        // 비밀번호가 일치하면 사용자의 고유 식별자 반환
-        logger.info("사용자 인증 완료: $email")
-        return user.userIdx!!
+        return user
     }
 
     @Transactional
@@ -153,16 +161,8 @@ class UserServiceImpl(
     override fun changePassword(email: String, oldPassword: String, newPassword: String) {
         logger.info("비밀번호 변경 요청. 이메일: $email")
 
-        val user = userRepository.findByEmail(email).orElseThrow {
-            logger.error("해당 이메일을 가진 사용자를 찾을 수 없음: $email")
-            UserNotFoundException(email)
-        }
-
         // 기존 비밀번호 확인
-        if (!passwordEncoder.matches(oldPassword, user.password)) {
-            logger.error("비밀번호 불일치: $email")
-            throw InvalidPasswordException(email)
-        }
+        val user = findUserByEmailAndPassword(email, oldPassword)
 
         // 새 비밀번호 암호화 후 저장
         user.password = passwordEncoder.encode(newPassword)
