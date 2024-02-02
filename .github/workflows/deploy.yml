@@ -50,9 +50,10 @@ jobs:
         uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}
-          fields: repo,author,ref,job,took
+          fields: repo,author,ref,workflow,job,took
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always()
 
   update-k8s:
     needs: build-docker-image
@@ -86,6 +87,7 @@ jobs:
         uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}
-          fields: repo,author,ref,job,took
+          fields: repo,author,ref,workflow,job,took
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always()
