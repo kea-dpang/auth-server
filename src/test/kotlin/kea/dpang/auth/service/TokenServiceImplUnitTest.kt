@@ -36,7 +36,7 @@ class TokenServiceImplUnitTest : BehaviorSpec({
     Given("사용자 ID와 매칭되는 유저가 존재하고, 해당 유저의 리프레시 토큰이 이미 Redis에 존재하는 경우") {
         val identifier = 1L
         val user = User(identifier, "test@email.com", "password", Role.USER)
-        val jwtToken = Token("new_access_token", "new_refresh_token")
+        val jwtToken = Token(Role.USER, "new_access_token", "new_refresh_token")
         val refreshToken = RefreshToken(identifier, jwtToken.refreshToken)
 
         every { mockUserRepository.findById(identifier) } returns Optional.of(user)
@@ -60,7 +60,7 @@ class TokenServiceImplUnitTest : BehaviorSpec({
     Given("사용자 ID와 매칭되는 유저가 존재하지만, 해당 유저의 리프레시 토큰이 Redis에 존재하지 않는 경우") {
         val identifier = 1L
         val user = User(identifier, "test@email.com", "password", Role.USER)
-        val jwtToken = Token("new_access_token", "new_refresh_token")
+        val jwtToken = Token(Role.USER, "new_access_token", "new_refresh_token")
         val refreshToken = RefreshToken(identifier, jwtToken.refreshToken)
 
         every { mockUserRepository.findById(identifier) } returns Optional.of(user)
@@ -104,7 +104,7 @@ class TokenServiceImplUnitTest : BehaviorSpec({
         every { mockJwtTokenProvider.getClientIdFromToken(token) } returns userIdx
         every { mockUserRepository.findById(userIdx) } returns Optional.of(user)
         every { mockRefreshTokenRepository.findById(userIdx) } returns Optional.of(refreshToken)
-        every { mockJwtTokenProvider.createTokens(any(), any()) } returns Token("new_access_token", "new_refresh_token")
+        every { mockJwtTokenProvider.createTokens(any(), any()) } returns Token(Role.USER, "new_access_token", "new_refresh_token")
         every { mockRefreshTokenRepository.deleteById(userIdx) } just Runs
 
         When("토큰 재발급을 요청하면") {

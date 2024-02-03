@@ -79,7 +79,7 @@ class UserServiceImpl(
 
         // 비밀번호가 일치하면 사용자의 고유 식별자 반환
         logger.info("사용자 인증 완료: $email")
-        return user.userIdx!!
+        return user.id!!
     }
 
     @Transactional(readOnly = true)

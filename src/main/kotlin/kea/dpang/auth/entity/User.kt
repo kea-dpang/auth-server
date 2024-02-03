@@ -1,10 +1,6 @@
 package kea.dpang.auth.entity
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
+import jakarta.persistence.*
 import kea.dpang.auth.base.BaseEntity
 import kea.dpang.auth.base.Role
 import lombok.AllArgsConstructor
@@ -21,13 +17,14 @@ data class User(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_idx")
-    var userIdx: Long? = null,
+    @Column(name = "user_id")
+    var id: Long? = null,
 
     var email: String? = null,
 
     var password: String? = null,
 
+    @Enumerated(EnumType.STRING)
     var role: Role = Role.USER
 
 ) : BaseEntity()

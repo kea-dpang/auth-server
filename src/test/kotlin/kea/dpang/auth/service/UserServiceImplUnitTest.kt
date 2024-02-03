@@ -11,6 +11,7 @@ import kea.dpang.auth.exception.InvalidVerificationCodeException
 import kea.dpang.auth.exception.UserNotFoundException
 import kea.dpang.auth.exception.VerificationCodeNotFoundException
 import kea.dpang.auth.feign.NotificationServiceFeignClient
+import kea.dpang.auth.feign.UserServiceFeignClient
 import kea.dpang.auth.redis.entity.VerificationCode
 import kea.dpang.auth.redis.repository.VerificationCodeRepository
 import kea.dpang.auth.repository.UserRepository
@@ -22,11 +23,13 @@ import kotlin.random.Random
 
 class UserServiceImplUnitTest : BehaviorSpec({
     val mockNotificationServiceFeignClient = mockk<NotificationServiceFeignClient>()
+    val mockUserServiceFeignClient = mockk<UserServiceFeignClient>()
     val mockUserRepository = mockk<UserRepository>()
     val mockVerificationCodeRepository = mockk<VerificationCodeRepository>()
     val mockPasswordEncoder = mockk<PasswordEncoder>()
     val userService = UserServiceImpl(
         mockNotificationServiceFeignClient,
+        mockUserServiceFeignClient,
         mockUserRepository,
         mockVerificationCodeRepository,
         mockPasswordEncoder
@@ -37,7 +40,7 @@ class UserServiceImplUnitTest : BehaviorSpec({
         val password = "password"
         val encodedPassword = "encodedPassword"
         val userIdx = 1L
-        val user = User(userIdx = userIdx, email = email, password = encodedPassword)
+        val user = User(id = userIdx, email = email, password = encodedPassword)
 
         every { mockUserRepository.findByEmail(email) } returns Optional.of(user)
         every { mockPasswordEncoder.matches(password, encodedPassword) } returns true

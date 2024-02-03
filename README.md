@@ -17,7 +17,7 @@
 ```mermaid
 erDiagram
     USER {
-        bigint user_idx PK "사용자 인덱스"
+        bigint user_id PK "사용자 인덱스"
         enum role "사용자 권한"
         varchar(255) email "사용자 이메일(ID)"
         varchar(255) password "사용자 비밀번호"
