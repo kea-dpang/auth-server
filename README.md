@@ -1,4 +1,4 @@
-# DPANG Auth SERVER
+# DPANG AUTH SERVER
 
 ## 🌐 프로젝트 개요
 
