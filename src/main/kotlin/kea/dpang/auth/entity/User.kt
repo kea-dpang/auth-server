@@ -17,8 +17,8 @@ data class User(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_idx")
-    var userIdx: Long? = null,
+    @Column(name = "user_id")
+    var id: Long? = null,
 
     var email: String? = null,
 
