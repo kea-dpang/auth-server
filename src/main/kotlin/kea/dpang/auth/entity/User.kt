@@ -1,5 +1,6 @@
 package kea.dpang.auth.entity
 
+import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
@@ -20,6 +21,7 @@ data class User(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_idx")
     var userIdx: Long? = null,
 
     var email: String? = null,
