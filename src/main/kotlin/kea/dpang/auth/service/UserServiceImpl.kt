@@ -181,9 +181,9 @@ class UserServiceImpl(
     }
 
     @Transactional
-    override fun deleteAccount(userId: Long) {
-        userRepository.deleteById(userId)
-        logger.info("사용자 계정이 성공적으로 삭제되었습니다. 사용자 ID: {}", userId)
+    override fun deleteAccount(id: Long) {
+        userRepository.deleteById(id)
+        logger.info("사용자 계정이 성공적으로 삭제되었습니다. 사용자 ID: {}", id)
     }
 
     companion object {
