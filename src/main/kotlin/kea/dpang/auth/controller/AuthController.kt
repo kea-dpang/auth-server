@@ -131,8 +131,8 @@ class AuthController(
 
     @DeleteMapping("/users/{id}")
     @Operation(summary = "회원 탈퇴", description = "회원 탈퇴를 진행합니다. 해당 API는 회원 탈퇴 시 사용자 서버에서 호출됩니다.")
-    fun deleteUser(@PathVariable id: Long): ResponseEntity<BaseResponse> {
-        userService.deleteAccount(id)
+    fun deleteUser(@PathVariable id: Long, @RequestBody dto: DeleteUserRequestDto): ResponseEntity<BaseResponse> {
+        userService.deleteAccount(id, dto.password, dto.reason, dto.message)
         tokenService.removeToken(id)
 
         val baseResponse = BaseResponse(
