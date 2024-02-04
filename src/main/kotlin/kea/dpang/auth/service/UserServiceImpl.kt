@@ -3,9 +3,9 @@ package kea.dpang.auth.service
 import kea.dpang.auth.base.Role
 import kea.dpang.auth.entity.User
 import kea.dpang.auth.exception.*
-import kea.dpang.auth.feign.dto.EmailNotificationRequestDto
 import kea.dpang.auth.feign.NotificationServiceFeignClient
 import kea.dpang.auth.feign.UserServiceFeignClient
+import kea.dpang.auth.feign.dto.EmailNotificationRequestDto
 import kea.dpang.auth.feign.dto.RegisterUserRequestDto
 import kea.dpang.auth.redis.entity.VerificationCode
 import kea.dpang.auth.redis.repository.VerificationCodeRepository
@@ -62,12 +62,14 @@ class UserServiceImpl(
         logger.info("사용자 정보 저장 완료: $email")
 
         // 사용자 정보를 사용자 서버로 전달해 사용자 생성
-        userServiceFeignClient.registerUser(RegisterUserRequestDto(
-            email = email,
-            employeeNumber = employeeNumber,
-            name = name,
-            joinDate = joinDate
-        ))
+        userServiceFeignClient.registerUser(
+            RegisterUserRequestDto(
+                email = email,
+                employeeNumber = employeeNumber,
+                name = name,
+                joinDate = joinDate
+            )
+        )
 
         logger.info("사용자 생성 완료: $email")
     }
@@ -181,9 +183,43 @@ class UserServiceImpl(
     }
 
     @Transactional
-    override fun deleteAccount(userId: Long) {
-        userRepository.deleteById(userId)
-        logger.info("사용자 계정이 성공적으로 삭제되었습니다. 사용자 ID: {}", userId)
+    override fun deleteAccount(id: Long, password: String, reason: String, message: String) {
+
+        // 사용자 조회
+        val user = userRepository.findById(id).orElseThrow {
+            logger.error("해당 ID를 가진 사용자를 찾을 수 없음: $id")
+            UserNotFoundException(id)
+        }
+
+        // 비밀번호 확인
+        if (!passwordEncoder.matches(password, user.password)) {
+            logger.error("비밀번호 불일치: {}", user.email)
+            throw InvalidPasswordException(user.email!!)
+        }
+
+        logger.info("서비스별 사용자 계정 삭제 요청. 사용자 ID: {}", id)
+
+        logger.info("마일리지 서비스 사용자 정보 삭제 요청. 사용자 ID: {}", id)
+        // Todo: 마일리지 서비스 사용자 정보 삭제 요청
+        logger.info("마일리지 서비스 사용자 정보 삭제 완료. 사용자 ID: {}", id)
+
+        // 사용자 - 남길 말씀 같은거 보내기
+        logger.info("사용자 서비스 사용자 정보 삭제 요청. 사용자 ID: {}", id)
+        // Todo: 사용자 서비스 사용자 정보 삭제 요청
+        logger.info("사용자 서비스 사용자 정보 삭제 완료. 사용자 ID: {}", id)
+
+        // qna
+        logger.info("QnA 서비스 사용자 정보 삭제 요청. 사용자 ID: {}", id)
+        // Todo: QnA 서비스 사용자 정보 삭제 요청
+        logger.info("QnA 서비스 사용자 정보 삭제 완료. 사용자 ID: {}", id)
+
+        // 주문
+        logger.info("주문 서비스 사용자 정보 삭제 요청. 사용자 ID: {}", id)
+        // Todo: 주문 서비스 사용자 정보 삭제 요청
+        logger.info("주문 서비스 사용자 정보 삭제 완료. 사용자 ID: {}", id)
+
+        userRepository.deleteById(id)
+        logger.info("사용자 계정이 성공적으로 삭제되었습니다. 사용자 ID: {}", id)
     }
 
     companion object {

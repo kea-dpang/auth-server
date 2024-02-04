@@ -50,5 +50,5 @@ interface UserService {
      *
      * 사용자의 고유 식별자를 기반으로 해당 사용자 계정을 삭제합니다.
      */
-    fun deleteAccount(userId: Long)
+    fun deleteAccount(id: Long, password: String, reason: String, message: String)
 }
