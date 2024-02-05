@@ -12,6 +12,6 @@ import org.springframework.web.bind.annotation.RequestBody
 @FeignClient(name = "notification-server", configuration = [FeignConfig::class])
 fun interface NotificationServiceFeignClient {
 
-    @PostMapping("/api/notifications/email", headers = ["X-DPANG-CLIENT-ROLE: SYSTEM"])
+    @PostMapping("/api/notifications/email")
     fun sendEmailVerificationCode(@RequestBody dto: EmailNotificationRequestDto) : ResponseEntity<BaseResponse>
 }
