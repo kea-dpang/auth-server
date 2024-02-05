@@ -87,8 +87,11 @@ class AuthController(
 
         val token = tokenService.createToken(userId)
 
+        val userDto = userService.getUserInfo(userId)
+
         val loginResponseDto = LoginResponseDto(
             userIdx = userId,
+            userName = userDto.name,
             token = token
         )
 

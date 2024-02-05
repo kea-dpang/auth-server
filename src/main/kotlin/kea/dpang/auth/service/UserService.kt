@@ -1,6 +1,7 @@
 package kea.dpang.auth.service
 
 import kea.dpang.auth.base.Role
+import kea.dpang.auth.feign.dto.UserDto
 import java.time.LocalDate
 
 interface UserService {
@@ -21,6 +22,8 @@ interface UserService {
      * 검증에 성공한 경우, 사용자의 고유 식별자인 userIdx를 반환합니다.
      */
     fun verifyUser(email: String, password: String): Long
+
+    fun getUserInfo(userId: Long): UserDto
 
     /**
      * 비밀번호 재설정 요청 메서드.

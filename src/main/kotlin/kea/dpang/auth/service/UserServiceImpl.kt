@@ -9,6 +9,7 @@ import kea.dpang.auth.feign.UserServiceFeignClient
 import kea.dpang.auth.feign.dto.DeleteUserRequestDto
 import kea.dpang.auth.feign.dto.EmailNotificationRequestDto
 import kea.dpang.auth.feign.dto.RegisterUserRequestDto
+import kea.dpang.auth.feign.dto.UserDto
 import kea.dpang.auth.redis.entity.VerificationCode
 import kea.dpang.auth.redis.repository.VerificationCodeRepository
 import kea.dpang.auth.repository.UserRepository
@@ -102,6 +103,13 @@ class UserServiceImpl(
         }
 
         return user
+    }
+
+    override fun getUserInfo(userId: Long): UserDto {
+        return userServiceFeignClient.getUserInfo(userId).body?.data?.let {
+            logger.info("사용자 정보 조회 완료: $userId")
+            it
+        } ?: throw UserNotFoundException(userId)
     }
 
     @Transactional
