@@ -3,8 +3,10 @@ package kea.dpang.auth.service
 import kea.dpang.auth.base.Role
 import kea.dpang.auth.entity.User
 import kea.dpang.auth.exception.*
+import kea.dpang.auth.feign.MileageServiceFeignClient
 import kea.dpang.auth.feign.NotificationServiceFeignClient
 import kea.dpang.auth.feign.UserServiceFeignClient
+import kea.dpang.auth.feign.dto.DeleteUserRequestDto
 import kea.dpang.auth.feign.dto.EmailNotificationRequestDto
 import kea.dpang.auth.feign.dto.RegisterUserRequestDto
 import kea.dpang.auth.redis.entity.VerificationCode
@@ -24,6 +26,7 @@ import kotlin.random.Random
 @Slf4j
 @Service
 class UserServiceImpl(
+    private val mileageServiceFeignClient: MileageServiceFeignClient,
     private val notificationServiceFeignClient: NotificationServiceFeignClient,
     private val userServiceFeignClient: UserServiceFeignClient,
     private val userRepository: UserRepository,
@@ -183,7 +186,7 @@ class UserServiceImpl(
     }
 
     @Transactional
-    override fun deleteAccount(id: Long, password: String, reason: String, message: String) {
+    override fun deleteAccount(id: Long, password: String, reason: List<String>, message: String) {
 
         // 사용자 조회
         val user = userRepository.findById(id).orElseThrow {
@@ -200,12 +203,11 @@ class UserServiceImpl(
         logger.info("서비스별 사용자 계정 삭제 요청. 사용자 ID: {}", id)
 
         logger.info("마일리지 서비스 사용자 정보 삭제 요청. 사용자 ID: {}", id)
-        // Todo: 마일리지 서비스 사용자 정보 삭제 요청
+        mileageServiceFeignClient.deleteMileageInfo(id, id)
         logger.info("마일리지 서비스 사용자 정보 삭제 완료. 사용자 ID: {}", id)
 
-        // 사용자 - 남길 말씀 같은거 보내기
         logger.info("사용자 서비스 사용자 정보 삭제 요청. 사용자 ID: {}", id)
-        // Todo: 사용자 서비스 사용자 정보 삭제 요청
+        userServiceFeignClient.deleteUserInfo(id, DeleteUserRequestDto(reason, message))
         logger.info("사용자 서비스 사용자 정보 삭제 완료. 사용자 ID: {}", id)
 
         // qna
