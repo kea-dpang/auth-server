@@ -1,16 +1,11 @@
-package kea.dpang.auth.config
+package kea.dpang.auth.config.feign
 
-import feign.Logger
 import feign.RequestInterceptor
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-class FeignConfig {
-    @Bean
-    fun feignLoggerLevel(): Logger.Level {
-        return Logger.Level.FULL
-    }
+class NotificationFeignConfig {
 
     @Bean
     fun requestInterceptor(): RequestInterceptor {
