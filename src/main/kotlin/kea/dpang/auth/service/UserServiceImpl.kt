@@ -6,10 +6,7 @@ import kea.dpang.auth.exception.*
 import kea.dpang.auth.feign.MileageServiceFeignClient
 import kea.dpang.auth.feign.NotificationServiceFeignClient
 import kea.dpang.auth.feign.UserServiceFeignClient
-import kea.dpang.auth.feign.dto.DeleteUserRequestDto
-import kea.dpang.auth.feign.dto.EmailNotificationRequestDto
-import kea.dpang.auth.feign.dto.RegisterUserRequestDto
-import kea.dpang.auth.feign.dto.UserDto
+import kea.dpang.auth.feign.dto.*
 import kea.dpang.auth.redis.entity.VerificationCode
 import kea.dpang.auth.redis.repository.VerificationCodeRepository
 import kea.dpang.auth.repository.UserRepository
@@ -110,6 +107,13 @@ class UserServiceImpl(
             logger.info("사용자 정보 조회 완료: $userId")
             it
         } ?: throw UserNotFoundException(userId)
+    }
+
+    override fun getUserMileageInfo(userId: Long): MileageDto {
+        return mileageServiceFeignClient.getUserMileageInfo(userId, userId).body?.data?.let {
+            logger.info("마일리지 정보 조회 완료: $userId")
+            it
+        } ?: throw MileageNotFoundException(userId)
     }
 
     @Transactional

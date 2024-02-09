@@ -1,6 +1,7 @@
 package kea.dpang.auth.service
 
 import kea.dpang.auth.base.Role
+import kea.dpang.auth.feign.dto.MileageDto
 import kea.dpang.auth.feign.dto.UserDto
 import java.time.LocalDate
 
@@ -24,6 +25,8 @@ interface UserService {
     fun verifyUser(email: String, password: String): Long
 
     fun getUserInfo(userId: Long): UserDto
+
+    fun getUserMileageInfo(userId: Long): MileageDto
 
     /**
      * 비밀번호 재설정 요청 메서드.

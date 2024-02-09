@@ -80,18 +80,24 @@ class AuthController(
         @RequestBody loginRequestDto: LoginRequestDto
     ): ResponseEntity<SuccessResponse<LoginResponseDto>> {
 
-        val userId = userService.verifyUser(
+        val userIdx = userService.verifyUser(
             loginRequestDto.email,
             loginRequestDto.password
         )
 
-        val token = tokenService.createToken(userId)
+        val token = tokenService.createToken(userIdx)
 
-        val userDto = userService.getUserInfo(userId)
+        val userDto = userService.getUserInfo(userIdx)
+
+        val mileageInfo = userService.getUserMileageInfo(userIdx)
 
         val loginResponseDto = LoginResponseDto(
-            userIdx = userId,
-            userName = userDto.name,
+            user = UserInfo(
+                userIdx = userIdx,
+                userName = userDto.name,
+                mileage = mileageInfo.mileage,
+                personalChargedMileage = mileageInfo.personalChargedMileage
+            ),
             token = token
         )
 
