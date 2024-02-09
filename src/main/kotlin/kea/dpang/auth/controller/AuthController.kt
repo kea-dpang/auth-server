@@ -1,6 +1,7 @@
 package kea.dpang.auth.controller
 
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import kea.dpang.auth.base.BaseResponse
 import kea.dpang.auth.base.Role
 import kea.dpang.auth.base.SuccessResponse
@@ -54,9 +55,10 @@ class AuthController(
         return ResponseEntity<BaseResponse>(baseResponse, HttpStatus.OK)
     }
 
-    @PostMapping("/change-password")
+    @PostMapping("/users/{userId}/change-password")
     @Operation(summary = "비밀번호 변경", description = "현재 비밀번호를 확인하고 일치하는 경우 새로운 비밀번호로 변경합니다.")
     fun changePassword(
+        @Parameter(description = "사용자 ID") @PathVariable userId: Long,
         @RequestBody changePasswordRequestDto: ChangePasswordRequestDto
     ): ResponseEntity<BaseResponse> {
 
@@ -104,13 +106,14 @@ class AuthController(
         return ResponseEntity.ok(SuccessResponse(HttpStatus.OK.value(), "로그인에 성공하였습니다.", loginResponseDto))
     }
 
-    @PostMapping("/renew-token")
+    @PostMapping("/users/{userId}/renew-token")
     @Operation(summary = "토큰 갱신", description = "기존 토큰을 갱신합니다.")
     fun renewToken(
+        @Parameter(description = "사용자 ID") @PathVariable userId: Long,
         @RequestBody renewTokenRequestDto: RenewTokenRequestDto
     ): ResponseEntity<SuccessResponse<Token>> {
 
-        val token = tokenService.refreshToken(renewTokenRequestDto.refreshToken)
+        val token = tokenService.refreshToken(userId, renewTokenRequestDto.refreshToken)
 
         return ResponseEntity.ok(SuccessResponse(HttpStatus.OK.value(), "토큰이 성공적으로 갱신되었습니다.", token))
     }
