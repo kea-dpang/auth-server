@@ -55,10 +55,16 @@ class TokenServiceImpl(
         return jwtToken
     }
 
-    override fun refreshToken(refreshToken: String): Token {
+    override fun refreshToken(identifier: Long, refreshToken: String): Token {
+        logger.info("사용자($identifier) 토큰 재발급 요청")
+
         // 리프래쉬 토큰에서 사용자 ID를 추출한다.
         val userIdx = jwtTokenProvider.getClientIdFromToken(refreshToken)!!
-        logger.info("사용자($userIdx) 토큰 재발급 요청")
+
+        // 클라이언트의 리프레시 토큰과 사용자 ID가 일치하는지 확인한다.
+        if (userIdx != identifier) {
+            throw InvalidRefreshTokenException(refreshToken)
+        }
 
         // MySQL에서 사용자 정보를 가져온다.
         val user = userRepository.findById(userIdx).orElseThrow {
