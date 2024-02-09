@@ -10,6 +10,8 @@ import kea.dpang.auth.service.TokenService
 import kea.dpang.auth.service.UserService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.prepost.PostAuthorize
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -55,15 +57,20 @@ class AuthController(
         return ResponseEntity<BaseResponse>(baseResponse, HttpStatus.OK)
     }
 
+    @PreAuthorize("#clientId == #userId")
     @PostMapping("/users/{userId}/change-password")
     @Operation(summary = "비밀번호 변경", description = "현재 비밀번호를 확인하고 일치하는 경우 새로운 비밀번호로 변경합니다.")
     fun changePassword(
+        @Parameter(hidden = true)
+        @RequestHeader("X-DPANG-CLIENT-ID") clientId: Long,
+        @Parameter(hidden = true)
+        @RequestHeader("X-DPANG-CLIENT-ROLE") role: String,
         @Parameter(description = "사용자 ID") @PathVariable userId: Long,
         @RequestBody changePasswordRequestDto: ChangePasswordRequestDto
     ): ResponseEntity<BaseResponse> {
 
         userService.changePassword(
-            changePasswordRequestDto.email,
+            userId,
             changePasswordRequestDto.oldPassword,
             changePasswordRequestDto.newPassword
         )
@@ -106,9 +113,15 @@ class AuthController(
         return ResponseEntity.ok(SuccessResponse(HttpStatus.OK.value(), "로그인에 성공하였습니다.", loginResponseDto))
     }
 
+    @PreAuthorize("#clientId == #userId")
+    @PostAuthorize("#role==returnObject.body.data.role")
     @PostMapping("/users/{userId}/renew-token")
     @Operation(summary = "토큰 갱신", description = "기존 토큰을 갱신합니다.")
     fun renewToken(
+        @Parameter(hidden = true)
+        @RequestHeader("X-DPANG-CLIENT-ID") clientId: Long,
+        @Parameter(hidden = true)
+        @RequestHeader("X-DPANG-CLIENT-ROLE") role: String,
         @Parameter(description = "사용자 ID") @PathVariable userId: Long,
         @RequestBody renewTokenRequestDto: RenewTokenRequestDto
     ): ResponseEntity<SuccessResponse<Token>> {
@@ -141,9 +154,17 @@ class AuthController(
         return ResponseEntity<BaseResponse>(baseResponse, HttpStatus.CREATED)
     }
 
+    @PreAuthorize("#clientId == #id")
     @DeleteMapping("/users/{id}")
     @Operation(summary = "회원 탈퇴", description = "회원 탈퇴를 진행합니다.")
-    fun deleteUser(@PathVariable id: Long, @RequestBody dto: DeleteUserRequestDto): ResponseEntity<BaseResponse> {
+    fun deleteUser(
+        @Parameter(hidden = true)
+        @RequestHeader("X-DPANG-CLIENT-ID") clientId: Long,
+        @Parameter(hidden = true)
+        @RequestHeader("X-DPANG-CLIENT-ROLE") role: String,
+        @PathVariable id: Long,
+        @RequestBody dto: DeleteUserRequestDto
+    ): ResponseEntity<BaseResponse> {
         userService.deleteAccount(id, dto.password, dto.reason, dto.message)
         tokenService.removeToken(id)
 

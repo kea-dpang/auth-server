@@ -47,9 +47,9 @@ interface UserService {
     /**
      * 비밀번호 변경 메서드.
      *
-     * 사용자의 이메일과 기존 비밀번호, 새로운 비밀번호를 입력받아 비밀번호를 변경합니다.
+     * 사용자의 기존 비밀번호, 새로운 비밀번호를 입력받아 비밀번호를 변경합니다.
      */
-    fun changePassword(email: String, oldPassword: String, newPassword: String)
+    fun changePassword(userId: Long, oldPassword: String, newPassword: String)
 
     /**
      * 계정 삭제 메서드.

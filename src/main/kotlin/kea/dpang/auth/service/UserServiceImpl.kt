@@ -185,16 +185,25 @@ class UserServiceImpl(
     }
 
     @Transactional
-    override fun changePassword(email: String, oldPassword: String, newPassword: String) {
-        logger.info("비밀번호 변경 요청. 이메일: $email")
+    override fun changePassword(userId: Long, oldPassword: String, newPassword: String) {
+        logger.info("사용자($userId) 비밀번호 변경 요청")
+
+        // 사용자 조회
+        val user = userRepository.findById(userId).orElseThrow {
+            logger.error("해당 ID를 가진 사용자를 찾을 수 없음: $userId")
+            UserNotFoundException(userId)
+        }
 
         // 기존 비밀번호 확인
-        val user = findUserByEmailAndPassword(email, oldPassword)
+        if (!passwordEncoder.matches(oldPassword, user.password)) {
+            logger.error("기존 비밀번호 불일치: {}", user.email)
+            throw InvalidPasswordException(user.email!!)
+        }
 
         // 새 비밀번호 암호화 후 저장
         user.password = passwordEncoder.encode(newPassword)
 
-        logger.info("비밀번호 변경 완료: $email")
+        logger.info("사용자({}) 비밀번호 변경 완료", userId)
     }
 
     @Transactional
