@@ -6,6 +6,68 @@
 
 이를 통해 사용자의 인증 관련 작업을 효율적으로 관리하고, 사용자 경험을 향상시키는데 중점을 두고 있습니다.
 
+## 🔀 프로젝트 아키텍처
+
+아래의 시퀀스 다이어그램은 본 프로젝트의 주요 컴포넌트인 Spring Cloud Gateway, 인증 서비스, 그리고 타 서비스 간의 상호작용을 보여줍니다.
+
+```mermaid
+sequenceDiagram
+    participant Client as Client
+    participant Gateway as Spring Cloud Gateway
+    participant AuthService as Authentication Service
+    participant MySQL as MySQL
+    participant OtherService as Other Service
+    Client ->> Gateway: 요청 전송
+
+    alt JWT 토큰 포함 요청인 경우
+        Gateway ->> AuthService: 요청 전달 <br> (X-DPANG-CLIENT-ID, X-DPANG-CLIENT-ROLE 헤더 추가)
+    else JWT 토큰 미포함 요청인 경우
+        Gateway ->> AuthService: 요청 전달
+    end
+
+    AuthService ->> AuthService: 해당 요청 권한 식별
+
+    opt 요청에 대한 권한이 있는 경우
+        AuthService ->> MySQL: 데이터 요청
+        MySQL -->> AuthService: 데이터 응답
+
+        opt 타 서비스의 데이터가 필요한 경우
+            AuthService ->> OtherService: API 요청 <br> (X-DPANG-SERVICE-NAME 헤더 추가)
+            OtherService ->> OtherService: 요청에 대한 처리
+            OtherService -->> AuthService: 처리된 API 응답
+        end
+
+        AuthService ->> AuthService: 응답 처리
+        AuthService -->> Gateway: 응답 전송
+        Gateway -->> Client: 최종 응답 전달
+    end
+
+    opt 요청에 대한 권한이 없는 경우
+        AuthService -->> Gateway: 사용자 권한 없음 응답
+        Gateway -->> Client: 사용자 권한 없음 응답
+    end
+    
+    opt 인증 실패한 경우
+        Gateway -->> Client: 인증 실패 응답
+    end
+
+```
+
+이 시퀀스 다이어그램을 통해 볼 수 있듯이, 모든 클라이언트 요청은 먼저 Spring Cloud Gateway를 통해 전달됩니다.
+
+만약 클라이언트 요청에 JWT 토큰이 포함되어 있다면, Gateway는 해당 토큰을 분석하여 사용자의 ID와 Role 정보를 추출하여 
+'X-DPANG-CLIENT-ID'와 'X-DPANG-CLIENT-ROLE'이라는 사용자 정의 헤더에 추가하여 인증 서비스에 전달합니다.
+
+인증 서비스는 해당 요청에 대한 권한을 식별하고, 권한이 있는 경우에만 요청을 처리합니다.
+
+권한이 있는 경우, 인증 서비스는 MySQL 데이터베이스에서 필요한 데이터를 요청하고, 그 데이터를 다시 클라이언트에게 반환합니다.
+
+만약 해당 요청에 대한 데이터가 다른 서비스에서 필요한 경우, 인증 서비스는 해당 서비스에 API 요청을 전달하고, 그 처리 결과를 다시 클라이언트에게 반환합니다.
+
+만약 해당 요청에 대한 권한이 없는 경우, 인증 서비스는 클라이언트에게 '사용자 권한 없음' 응답을 반환하며
+
+해당 요청에 대한 인증이 실패한 경우, Gateway는 클라이언트에게 '인증 실패' 응답을 반환합니다.
+
 ## 🗃️ 데이터베이스 구조
 
 ### MYSQL 데이터베이스 구조
